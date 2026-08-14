@@ -1,0 +1,50 @@
+{
+  "schema": "wellmanifest.project-ssot/evidence-index/v1",
+  "subject_id": "subactor.widget",
+  "sources": [
+    {
+      "id": "intent",
+      "kind": "intent",
+      "path": "project/ticket-001/intent.json",
+      "facts": {
+        "purpose": "Serve widget commands on a LAN host under subactor ownership.",
+        "placement": {
+          "home": "subactor",
+          "shape": "runtime_service",
+          "runtimeOwner": "subactor",
+          "adopt": [
+            "wellmanifest/dsl",
+            "wellmanifest/logs",
+            "wellmanifest/new-project"
+          ]
+        },
+        "adopted": [
+          "wellmanifest/dsl",
+          "wellmanifest/logs",
+          "wellmanifest/new-project"
+        ]
+      }
+    },
+    {
+      "id": "governance",
+      "kind": "governance-manifest",
+      "path": ".governance/manifest.json",
+      "facts": {
+        "placement": {
+          "home": "subactor",
+          "shape": "runtime_service"
+        }
+      }
+    },
+    {
+      "id": "pyproject",
+      "kind": "pyproject",
+      "path": "pyproject.toml",
+      "facts": {
+        "name": "widget",
+        "version": "0.1.0",
+        "packaging": ["pip"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-001",
+  "summary": "Serve widget commands on a LAN host under subactor ownership.",
+  "workstream": "widget-runtime",
+  "allowedPaths": ["src/**", "tests/**"],
+  "forbiddenPaths": [".env"],
+  "stacks": ["python"],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "placement": {
+    "home": "subactor",
+    "shape": "runtime_service",
+    "runtimeOwner": "subactor",
+    "adopt": ["wellmanifest/dsl", "wellmanifest/logs", "wellmanifest/new-project"]
+  }
+}

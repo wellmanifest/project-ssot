@@ -1,0 +1,23 @@
+{
+  "schema": "wellmanifest.project-ssot/interview/v1",
+  "subject_id": "subactor.widget",
+  "name": "Widget runtime",
+  "version": "0.1.0",
+  "placement": {
+    "home": "subactor",
+    "shape": "runtime_service",
+    "runtimeOwner": "subactor",
+    "adopt": [
+      "wellmanifest/dsl",
+      "wellmanifest/logs",
+      "wellmanifest/new-project"
+    ]
+  },
+  "purpose": "Serve widget commands on a LAN host under subactor ownership.",
+  "owners": ["github:subactor/widget"],
+  "readme_role": "generated_mirror",
+  "analyzer_present": false,
+  "analyzer_kind": "none",
+  "analyzer_noise": true,
+  "human_confirmed_debt": false
+}

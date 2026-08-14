@@ -1,0 +1,215 @@
+{
+  "schema": "wellmanifest.project-ssot/v1",
+  "id": "wellmanifest.ssot",
+  "name": "Wellmanifest SSOT decision DSL",
+  "version": "0.2.0-dev",
+  "purpose": "Interview-driven classification of duplicated trees into propose-only SSOT decisions",
+  "placement": {
+    "home": "wellmanifest",
+    "shape": "domain_pack",
+    "runtimeOwner": "wellmanifest",
+    "adopt": [
+      "wellmanifest/dsl",
+      "wellmanifest/ssot",
+      "wellmanifest/new-project",
+      "wellmanifest/modularity",
+      "wellmanifest/poa"
+    ]
+  },
+  "owners": [
+    {
+      "kind": "repository",
+      "id": "github:wellmanifest/ssot"
+    }
+  ],
+  "policy": {
+    "kind": "project_policy",
+    "descriptionIsProjection": true,
+    "readmeAuthority": "generated_from_document",
+    "unknownPolicy": "reject",
+    "effectModel": "propose-only",
+    "analyzerTreatAsDebtUntilInterview": false,
+    "adoptDoesNotImplyHome": true,
+    "forbid": [
+      "treat_readme_as_authority",
+      "treat_analyzer_as_debt",
+      "infer_home_from_adopt",
+      "runtime_service_in_wellmanifest",
+      "crawl_live_repository",
+      "copy_adopted_standard",
+      "keep_competing_readme_authority"
+    ],
+    "actions": [
+      {
+        "do": "use_document_as_ssot"
+      },
+      {
+        "do": "map_adopted_standard"
+      },
+      {
+        "do": "record_evidence_digest"
+      },
+      {
+        "do": "keep_readme_as_facade",
+        "target": "README.md"
+      },
+      {
+        "do": "generate_readme_from_document"
+      },
+      {
+        "do": "ignore_analyzer_until_interview"
+      },
+      {
+        "do": "document_known_divergent"
+      }
+    ]
+  },
+  "adopted": [
+    {
+      "standard": "wellmanifest.dsl",
+      "relation": "implements",
+      "uri": "https://github.com/wellmanifest/dsl"
+    },
+    {
+      "standard": "wellmanifest.modularity",
+      "relation": "compatible-with",
+      "uri": "https://github.com/wellmanifest/modularity"
+    },
+    {
+      "standard": "wellmanifest.new-project",
+      "relation": "maps-to"
+    },
+    {
+      "standard": "wellmanifest.poa",
+      "relation": "compatible-with",
+      "uri": "https://github.com/wellmanifest/poa"
+    },
+    {
+      "standard": "wellmanifest.ssot",
+      "relation": "maps-to"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "dsl-manifest",
+      "kind": "dsl-manifest",
+      "path": "dsl-manifest.json",
+      "precedence": 70,
+      "role": "authority",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "id": "agents",
+      "kind": "agents",
+      "path": "AGENTS.md",
+      "precedence": 78,
+      "role": "authority"
+    },
+    {
+      "id": "readme",
+      "kind": "readme",
+      "path": "README.md",
+      "precedence": 48,
+      "role": "projection_candidate",
+      "ssotKind": "facade"
+    },
+    {
+      "id": "docs-ssot",
+      "kind": "docs",
+      "path": "docs/SSOT.md",
+      "precedence": 50,
+      "role": "evidence",
+      "ssotKind": "generated_mirror"
+    },
+    {
+      "id": "ssot-decision",
+      "kind": "ssot-decision",
+      "path": "examples/c2004.ssot.json",
+      "precedence": 60,
+      "role": "authority"
+    },
+    {
+      "id": "analyzer-map",
+      "kind": "analyzer-map",
+      "path": "reports/map.toon.yaml",
+      "precedence": 10,
+      "role": "evidence"
+    }
+  ],
+  "relations": [
+    {
+      "id": "readme.facade",
+      "kind": "facade",
+      "subject": "README.md",
+      "canonical": "this-document",
+      "rationale": "README is a facade over this project-ssot document. Do not keep a second competing README as authority. A later generator may emit README FROM this AST."
+    },
+    {
+      "id": "readme.divergence",
+      "kind": "allowed_divergence",
+      "subject": "README.md",
+      "canonical": "$.purpose",
+      "knownDivergent": {
+        "reason": "Polish README intro and English marketing tone may differ from the schema purpose; the JSON AST remains canonical."
+      },
+      "rationale": "Polish README intro and English marketing tone may differ from the schema purpose; the JSON AST remains canonical."
+    },
+    {
+      "id": "docs.mirror",
+      "kind": "generated_mirror",
+      "subject": "docs/SSOT.md",
+      "canonical": "this-document",
+      "rationale": "Docs and schemas listed here are generated mirrors or projections of the project SSOT, not a second description authority."
+    }
+  ],
+  "packaging": {
+    "kind": "none"
+  },
+  "questions": [],
+  "receipt": {
+    "sourceDigests": [
+      {
+        "path": "dsl-manifest.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ]
+  },
+  "conflicts": [
+    {
+      "field": "name",
+      "values": [
+        {
+          "source": "dsl-manifest",
+          "value": "Wellmanifest SSOT decision DSL"
+        },
+        {
+          "source": "readme",
+          "value": "wellmanifest/ssot"
+        },
+        {
+          "source": "interview",
+          "value": "Wellmanifest SSOT decision DSL"
+        }
+      ],
+      "resolvedBy": "interview"
+    },
+    {
+      "field": "purpose",
+      "values": [
+        {
+          "source": "dsl-manifest",
+          "value": "Interview-driven classification of duplicated trees into propose-only SSOT decisions"
+        },
+        {
+          "source": "readme",
+          "value": "A generic SSOT creation layer. It interviews the user, classifies duplication, and emits a propose-only DSL document."
+        },
+        {
+          "source": "interview",
+          "value": "Interview-driven classification of duplicated trees into propose-only SSOT decisions"
+        }
+      ],
+      "resolvedBy": "interview"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "schema": "wellmanifest.project-ssot/v1",
+  "id": "subactor.widget",
+  "name": "Widget runtime",
+  "version": "0.1.0",
+  "purpose": "Serve widget commands on a LAN host under subactor ownership.",
+  "placement": {
+    "home": "subactor",
+    "shape": "runtime_service",
+    "runtimeOwner": "subactor",
+    "adopt": [
+      "wellmanifest/dsl",
+      "wellmanifest/logs",
+      "wellmanifest/new-project"
+    ]
+  },
+  "owners": [
+    {
+      "kind": "repository",
+      "id": "github:subactor/widget"
+    }
+  ],
+  "policy": {
+    "kind": "project_policy",
+    "descriptionIsProjection": true,
+    "readmeAuthority": "generated_from_document",
+    "unknownPolicy": "reject",
+    "effectModel": "propose-only",
+    "analyzerTreatAsDebtUntilInterview": false,
+    "adoptDoesNotImplyHome": true,
+    "forbid": [
+      "treat_readme_as_authority",
+      "treat_analyzer_as_debt",
+      "infer_home_from_adopt",
+      "runtime_service_in_wellmanifest",
+      "crawl_live_repository",
+      "copy_adopted_standard"
+    ],
+    "actions": [
+      {
+        "do": "use_document_as_ssot"
+      },
+      {
+        "do": "map_adopted_standard"
+      },
+      {
+        "do": "record_evidence_digest"
+      }
+    ]
+  },
+  "adopted": [
+    {
+      "standard": "wellmanifest.dsl",
+      "relation": "maps-to"
+    },
+    {
+      "standard": "wellmanifest.logs",
+      "relation": "maps-to"
+    },
+    {
+      "standard": "wellmanifest.new-project",
+      "relation": "maps-to"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "intent",
+      "kind": "intent",
+      "path": "project/ticket-001/intent.json",
+      "precedence": 85,
+      "role": "authority"
+    },
+    {
+      "id": "governance",
+      "kind": "governance-manifest",
+      "path": ".governance/manifest.json",
+      "precedence": 80,
+      "role": "authority"
+    },
+    {
+      "id": "pyproject",
+      "kind": "pyproject",
+      "path": "pyproject.toml",
+      "precedence": 40,
+      "role": "packaging"
+    }
+  ],
+  "relations": [],
+  "packaging": {
+    "kind": "pip",
+    "path": "pyproject.toml"
+  },
+  "questions": [],
+  "conflicts": [
+    {
+      "field": "name",
+      "values": [
+        {
+          "source": "pyproject",
+          "value": "widget"
+        },
+        {
+          "source": "interview",
+          "value": "Widget runtime"
+        }
+      ],
+      "resolvedBy": "interview"
+    }
+  ]
+}

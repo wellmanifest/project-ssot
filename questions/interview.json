@@ -1,0 +1,109 @@
+{
+  "schema": "wellmanifest.project-ssot/interview/v1",
+  "id": "wellmanifest.project-ssot.interview",
+  "version": "0.1.0",
+  "purpose": "Assemble one project SSOT document from typed evidence and interview answers. Do not crawl a live repository.",
+  "questions": [
+    {
+      "id": "subject_id",
+      "prompt": "What is the stable project id? (e.g. wellmanifest.ssot or subactor.widget)",
+      "type": "identifier",
+      "required": true
+    },
+    {
+      "id": "name",
+      "prompt": "What is the human-facing project name?",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "version",
+      "prompt": "What SemVer should the description document declare?",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "home",
+      "prompt": "placement.home: which org HOMEs this repository? (wellmanifest | subactor | semcod). \"w ramach wellmanifest\" means ADOPT, not HOME.",
+      "type": "enum",
+      "choices": ["wellmanifest", "subactor", "semcod"],
+      "required": true
+    },
+    {
+      "id": "shape",
+      "prompt": "placement.shape: domain_pack | runtime_service | both. runtime_service must not HOME wellmanifest.",
+      "type": "enum",
+      "choices": ["domain_pack", "runtime_service", "both"],
+      "required": true
+    },
+    {
+      "id": "runtimeOwner",
+      "prompt": "placement.runtimeOwner: who runs the CLI/daemon? Same enum as home. Empty inherits home. wellmanifest does not host product daemons.",
+      "type": "enum",
+      "choices": ["wellmanifest", "subactor", "semcod"],
+      "required": false
+    },
+    {
+      "id": "adopt",
+      "prompt": "placement.adopt: which wellmanifest packs to follow? (comma-separated wellmanifest/<pack> ids). ADOPT is not HOME.",
+      "type": "string-list",
+      "required": false
+    },
+    {
+      "id": "purpose",
+      "prompt": "One sentence: what is this project for? This is the field humans get wrong when README and schema disagree.",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "owners",
+      "prompt": "Who owns semantics? (comma-separated ids, e.g. github:wellmanifest/ssot)",
+      "type": "string-list",
+      "required": true
+    },
+    {
+      "id": "purpose_authority",
+      "prompt": "If evidence sources disagree on purpose, which source id wins? (dsl-manifest, intent, interview, or empty if purpose above is the resolution)",
+      "type": "text",
+      "required": false
+    },
+    {
+      "id": "readme_role",
+      "prompt": "How does README relate to this document?",
+      "type": "enum",
+      "choices": ["facade", "generated_mirror", "allowed_divergence", "unknown"],
+      "required": true
+    },
+    {
+      "id": "divergence_reason",
+      "prompt": "If README or marketing copy may differ from schema purpose, what is the KNOWN_DIVERGENT reason? (empty if identical)",
+      "type": "text",
+      "required": false
+    },
+    {
+      "id": "analyzer_present",
+      "prompt": "Is a code2llm TOON, map.toon.yaml, or other analyzer artifact listed in the evidence index?",
+      "type": "bool",
+      "required": true
+    },
+    {
+      "id": "analyzer_kind",
+      "prompt": "If yes, which analyzer? (code2llm-toon, map-toon-yaml, redup, other, none)",
+      "type": "enum",
+      "choices": ["code2llm-toon", "map-toon-yaml", "redup", "other", "none"],
+      "required": true
+    },
+    {
+      "id": "analyzer_noise",
+      "prompt": "Should analyzer output stay evidence-only until a human confirms it? (almost always yes)",
+      "type": "bool",
+      "required": true
+    },
+    {
+      "id": "human_confirmed_debt",
+      "prompt": "Has a human confirmed analyzer hits are real description debt, not noise?",
+      "type": "bool",
+      "required": true
+    }
+  ]
+}

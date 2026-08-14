@@ -1,0 +1,43 @@
+{
+  "schema": "wellmanifest.project-ssot/v1",
+  "id": "invalid.analyzer-debt",
+  "name": "Analyzer as debt",
+  "version": "0.1.0",
+  "purpose": "A document that treats code2llm TOON as description debt.",
+  "placement": {
+    "home": "wellmanifest",
+    "shape": "domain_pack",
+    "runtimeOwner": "wellmanifest",
+    "adopt": ["wellmanifest/dsl"]
+  },
+  "owners": [{ "kind": "repository", "id": "github:wellmanifest/noise" }],
+  "policy": {
+    "kind": "project_policy",
+    "descriptionIsProjection": true,
+    "readmeAuthority": "generated_from_document",
+    "unknownPolicy": "reject",
+    "effectModel": "propose-only",
+    "analyzerTreatAsDebtUntilInterview": true,
+    "adoptDoesNotImplyHome": true,
+    "forbid": [
+      "treat_readme_as_authority",
+      "treat_analyzer_as_debt",
+      "infer_home_from_adopt",
+      "runtime_service_in_wellmanifest",
+      "crawl_live_repository",
+      "copy_adopted_standard"
+    ]
+  },
+  "adopted": [{ "standard": "wellmanifest.dsl", "relation": "implements" }],
+  "evidence": [
+    {
+      "id": "toon",
+      "kind": "analyzer-toon",
+      "path": "reports/project.toon",
+      "precedence": 10,
+      "role": "authority"
+    }
+  ],
+  "relations": [],
+  "questions": []
+}

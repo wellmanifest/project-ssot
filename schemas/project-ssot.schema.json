@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.dev/schemas/project-ssot/v1",
+  "title": "Wellmanifest project SSOT document v1",
+  "description": "Canonical project description assembled from typed evidence. Propose-only: the document never authorizes edits, crawls, or README rewrites. Generated prose is a projection of this AST.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "name",
+    "version",
+    "purpose",
+    "placement",
+    "owners",
+    "policy",
+    "adopted",
+    "evidence",
+    "relations",
+    "questions"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "format": "uri" },
+    "schema": { "const": "wellmanifest.project-ssot/v1" },
+    "id": { "$ref": "#/$defs/identifier" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "version": { "$ref": "#/$defs/semver" },
+    "purpose": { "type": "string", "minLength": 1, "maxLength": 400 },
+    "placement": { "$ref": "#/$defs/placement" },
+    "owners": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/owner" }
+    },
+    "policy": { "$ref": "#/$defs/projectPolicy" },
+    "adopted": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/adopted" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "relations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relation" }
+    },
+    "packaging": { "$ref": "#/$defs/packaging" },
+    "receipt": { "$ref": "#/$defs/receipt" },
+    "conflicts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/conflict" }
+    },
+    "questions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 400 }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "home": {
+      "enum": ["wellmanifest", "subactor", "semcod"]
+    },
+    "shape": {
+      "enum": ["domain_pack", "runtime_service", "both"]
+    },
+    "adoptId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^wellmanifest/[a-z0-9][a-z0-9-]*$"
+    },
+    "ssotKind": {
+      "enum": ["generated_mirror", "facade", "allowed_divergence"]
+    },
+    "sourceKind": {
+      "enum": [
+        "interview",
+        "intent",
+        "ticket",
+        "governance-manifest",
+        "agents",
+        "dsl-manifest",
+        "readme",
+        "docs",
+        "schema",
+        "ssot-decision",
+        "analyzer-toon",
+        "analyzer-map",
+        "pyproject",
+        "package-json",
+        "other"
+      ]
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["home", "shape"],
+      "description": "Same object as new-project intent.placement. ADOPT is not HOME. runtime_service must not HOME wellmanifest. runtimeOwner omitted inherits home.",
+      "properties": {
+        "home": { "$ref": "#/$defs/home" },
+        "shape": { "$ref": "#/$defs/shape" },
+        "runtimeOwner": { "$ref": "#/$defs/home" },
+        "adopt": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/adoptId" }
+        }
+      }
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "enum": ["repository", "organization", "team", "person"] },
+        "id": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "forbidDo": {
+      "enum": [
+        "treat_readme_as_authority",
+        "treat_analyzer_as_debt",
+        "infer_home_from_adopt",
+        "runtime_service_in_wellmanifest",
+        "keep_competing_readme_authority",
+        "crawl_live_repository",
+        "copy_adopted_standard"
+      ]
+    },
+    "actionDo": {
+      "enum": [
+        "use_document_as_ssot",
+        "generate_readme_from_document",
+        "keep_readme_as_facade",
+        "document_known_divergent",
+        "ask_clarifying_questions",
+        "ignore_analyzer_until_interview",
+        "map_adopted_standard",
+        "record_evidence_digest"
+      ]
+    },
+    "projectPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "descriptionIsProjection",
+        "readmeAuthority",
+        "unknownPolicy",
+        "effectModel",
+        "analyzerTreatAsDebtUntilInterview",
+        "adoptDoesNotImplyHome",
+        "forbid"
+      ],
+      "properties": {
+        "kind": { "const": "project_policy" },
+        "descriptionIsProjection": { "const": true },
+        "readmeAuthority": { "enum": ["generated_from_document", "none"] },
+        "unknownPolicy": { "const": "reject" },
+        "effectModel": { "const": "propose-only" },
+        "analyzerTreatAsDebtUntilInterview": { "type": "boolean" },
+        "adoptDoesNotImplyHome": { "const": true },
+        "forbid": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/forbidDo" }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["do"],
+            "properties": {
+              "do": { "$ref": "#/$defs/actionDo" },
+              "target": { "type": "string", "minLength": 1, "maxLength": 300 }
+            }
+          }
+        }
+      }
+    },
+    "adopted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["standard", "relation"],
+      "properties": {
+        "standard": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "relation": {
+          "enum": ["extends", "implements", "maps-to", "compatible-with"]
+        },
+        "uri": { "type": "string", "minLength": 1, "maxLength": 300 }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path", "precedence", "role"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": { "$ref": "#/$defs/sourceKind" },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "precedence": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "role": {
+          "enum": ["authority", "evidence", "projection_candidate", "packaging"]
+        },
+        "digest": { "$ref": "#/$defs/digest" },
+        "ssotKind": { "$ref": "#/$defs/ssotKind" }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "subject", "canonical"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": { "$ref": "#/$defs/ssotKind" },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "canonical": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "rationale": { "type": "string", "minLength": 1, "maxLength": 800 },
+        "knownDivergent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reason"],
+          "properties": {
+            "reason": { "type": "string", "minLength": 1, "maxLength": 400 }
+          }
+        }
+      }
+    },
+    "packaging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["none", "pip", "npm", "other"] },
+        "path": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceDigests"],
+      "properties": {
+        "sourceDigests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "digest"],
+            "properties": {
+              "path": { "$ref": "#/$defs/relativePath" },
+              "digest": { "$ref": "#/$defs/digest" }
+            }
+          }
+        }
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "values"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "values": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "value"],
+            "properties": {
+              "source": { "type": "string", "minLength": 1, "maxLength": 80 },
+              "value": { "type": "string", "minLength": 1, "maxLength": 400 }
+            }
+          }
+        },
+        "resolvedBy": { "type": "string", "minLength": 1, "maxLength": 80 }
+      }
+    }
+  }
+}

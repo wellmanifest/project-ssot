@@ -1,0 +1,80 @@
+{
+  "schema": "wellmanifest.project-ssot/evidence-index/v1",
+  "subject_id": "wellmanifest.ssot",
+  "sources": [
+    {
+      "id": "dsl-manifest",
+      "kind": "dsl-manifest",
+      "path": "dsl-manifest.json",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "facts": {
+        "id": "wellmanifest.ssot",
+        "name": "Wellmanifest SSOT decision DSL",
+        "version": "0.2.0-dev",
+        "purpose": "Interview-driven classification of duplicated trees into propose-only SSOT decisions",
+        "owners": [
+          {
+            "kind": "repository",
+            "id": "github:wellmanifest/ssot"
+          }
+        ],
+        "adopted": [
+          {
+            "standard": "wellmanifest.dsl",
+            "relation": "implements",
+            "uri": "https://github.com/wellmanifest/dsl"
+          },
+          {
+            "standard": "wellmanifest.modularity",
+            "relation": "compatible-with",
+            "uri": "https://github.com/wellmanifest/modularity"
+          },
+          {
+            "standard": "wellmanifest.poa",
+            "relation": "compatible-with",
+            "uri": "https://github.com/wellmanifest/poa"
+          }
+        ]
+      }
+    },
+    {
+      "id": "agents",
+      "kind": "agents",
+      "path": "AGENTS.md",
+      "facts": {
+        "placement": {
+          "home": "wellmanifest",
+          "shape": "domain_pack",
+          "runtimeOwner": "wellmanifest"
+        }
+      }
+    },
+    {
+      "id": "readme",
+      "kind": "readme",
+      "path": "README.md",
+      "facts": {
+        "name": "wellmanifest/ssot",
+        "purpose": "A generic SSOT creation layer. It interviews the user, classifies duplication, and emits a propose-only DSL document."
+      }
+    },
+    {
+      "id": "docs-ssot",
+      "kind": "docs",
+      "path": "docs/SSOT.md",
+      "facts": {}
+    },
+    {
+      "id": "ssot-decision",
+      "kind": "ssot-decision",
+      "path": "examples/c2004.ssot.json",
+      "facts": {}
+    },
+    {
+      "id": "analyzer-map",
+      "kind": "analyzer-map",
+      "path": "reports/map.toon.yaml",
+      "facts": {}
+    }
+  ]
+}

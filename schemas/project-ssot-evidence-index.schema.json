@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.dev/schemas/project-ssot/evidence-index/v1",
+  "title": "Wellmanifest project-ssot evidence index v1",
+  "description": "Already-typed artifact index. A later generator may produce this file. This pack MUST NOT crawl a live repository to build it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "subject_id", "sources"],
+  "properties": {
+    "$schema": { "type": "string", "format": "uri" },
+    "schema": { "const": "wellmanifest.project-ssot/evidence-index/v1" },
+    "subject_id": { "$ref": "#/$defs/identifier" },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "sourceKind": {
+      "enum": [
+        "intent",
+        "ticket",
+        "governance-manifest",
+        "agents",
+        "dsl-manifest",
+        "readme",
+        "docs",
+        "schema",
+        "ssot-decision",
+        "analyzer-toon",
+        "analyzer-map",
+        "pyproject",
+        "package-json",
+        "other"
+      ]
+    },
+    "home": {
+      "enum": ["wellmanifest", "subactor", "semcod"]
+    },
+    "shape": {
+      "enum": ["domain_pack", "runtime_service", "both"]
+    },
+    "adoptId": {
+      "type": "string",
+      "pattern": "^wellmanifest/[a-z0-9][a-z0-9-]*$"
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["home", "shape"],
+      "description": "Copied from intent.json placement when present. Same closed vocabulary as new-project.",
+      "properties": {
+        "home": { "$ref": "#/$defs/home" },
+        "shape": { "$ref": "#/$defs/shape" },
+        "runtimeOwner": { "$ref": "#/$defs/home" },
+        "adopt": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/adoptId" }
+        }
+      }
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+        },
+        "placement": { "$ref": "#/$defs/placement" },
+        "home": { "$ref": "#/$defs/home" },
+        "shape": { "$ref": "#/$defs/shape" },
+        "runtimeOwner": { "$ref": "#/$defs/home" },
+        "purpose": { "type": "string", "minLength": 1, "maxLength": 400 },
+        "owners": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "id"],
+            "properties": {
+              "kind": { "enum": ["repository", "organization", "team", "person"] },
+              "id": { "type": "string", "minLength": 1, "maxLength": 200 }
+            }
+          }
+        },
+        "adopted": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string", "minLength": 1, "maxLength": 160 },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["standard"],
+                "properties": {
+                  "standard": { "type": "string", "minLength": 1, "maxLength": 160 },
+                  "relation": {
+                    "enum": ["extends", "implements", "maps-to", "compatible-with"]
+                  },
+                  "uri": { "type": "string", "minLength": 1, "maxLength": 300 }
+                }
+              }
+            ]
+          }
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 40 }
+        },
+        "packaging": {
+          "type": "array",
+          "items": {
+            "enum": ["none", "pip", "npm", "other"]
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path", "facts"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": { "$ref": "#/$defs/sourceKind" },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "digest": { "$ref": "#/$defs/digest" },
+        "facts": { "$ref": "#/$defs/facts" }
+      }
+    }
+  }
+}
