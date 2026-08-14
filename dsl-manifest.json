@@ -1,5 +1,5 @@
 {
-  "$schema": "https://wellmanifest.dev/schemas/dsl-manifest/v1",
+  "$schema": "https://wellmanifest.com/schemas/dsl-manifest/v1",
   "schema": "wellmanifest.dsl/manifest/v1",
   "id": "wellmanifest.project-ssot",
   "name": "Wellmanifest project description SSOT",
@@ -149,11 +149,11 @@
   "namespaces": [
     {
       "prefix": "wellmanifest",
-      "uri": "https://wellmanifest.dev/"
+      "uri": "https://wellmanifest.com/"
     },
     {
       "prefix": "project-ssot",
-      "uri": "https://wellmanifest.dev/project-ssot/"
+      "uri": "https://wellmanifest.com/project-ssot/"
     }
   ],
   "projections": [
@@ -286,7 +286,7 @@
         "revision": "b7d0595c95e5abbb48ebfdbdae0bc6d43c6f82f4",
         "contracts": [
           {
-            "ref": "schema://wellmanifest.dev/dsl/manifest/v1",
+            "ref": "schema://wellmanifest.com/dsl/manifest/v1",
             "digest": "sha256:34d356b76bbd483372df84bb986e15bb84e9c1f8b11b7dc9e3a6c7276c85ed13"
           }
         ]

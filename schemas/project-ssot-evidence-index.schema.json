@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://wellmanifest.dev/schemas/project-ssot/evidence-index/v1",
+  "$id": "https://wellmanifest.com/schemas/project-ssot/evidence-index/v1",
   "title": "Wellmanifest project-ssot evidence index v1",
   "description": "Already-typed artifact index. A later generator may produce this file. This pack MUST NOT crawl a live repository to build it.",
   "type": "object",

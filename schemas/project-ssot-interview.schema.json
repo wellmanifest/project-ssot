@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://wellmanifest.dev/schemas/project-ssot/interview/v1",
+  "$id": "https://wellmanifest.com/schemas/project-ssot/interview/v1",
   "title": "Wellmanifest project-ssot interview answers v1",
   "description": "Typed answers that resolve project identity. Placement reuses wellmanifest/new-project intent.placement (HOME / SHAPE / ADOPT / runtimeOwner). Natural language belongs only in declared text fields. Validity never authorizes edits or a live-repo crawl.",
   "type": "object",

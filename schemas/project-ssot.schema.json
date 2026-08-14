@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://wellmanifest.dev/schemas/project-ssot/v1",
+  "$id": "https://wellmanifest.com/schemas/project-ssot/v1",
   "title": "Wellmanifest project SSOT document v1",
   "description": "Canonical project description assembled from typed evidence. Propose-only: the document never authorizes edits, crawls, or README rewrites. Generated prose is a projection of this AST.",
   "type": "object",
