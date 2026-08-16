@@ -117,3 +117,11 @@ dsl-manifest.json   wellmanifest.dsl/manifest/v1 for this pack
 - [`wellmanifest/new-project`](https://github.com/wellmanifest/new-project) — `placement` vocabulary
 - [`wellmanifest/logs`](https://github.com/wellmanifest/logs) — receipt of digests that produced the description
 - code2llm / generate_readme — evidence producer / later projection, not this pack
+
+## Commercial registries
+
+Classify public price/entitlement files as a **facade** of an adopted pack
+catalog (example: portal `plans.json` → `wellmanifest/policy-dsl`
+`offer-catalog.json`). Allowed divergence is presentation-only. Amount and
+entitlement drift is not an interview outcome — it is a failed gate.
+
