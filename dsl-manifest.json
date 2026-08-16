@@ -38,17 +38,17 @@
     {
       "path": "schemas/project-ssot.schema.json",
       "role": "normative-source",
-      "digest": "sha256:8c81da6835e2901bbf7bf4f798180480964920902e162f980bb159d0100baccc"
+      "digest": "sha256:2a6582a96bb9fe12725cb4d6cd9b09c3f452607e05a0c8dca2c696c05ea2becd"
     },
     {
       "path": "schemas/project-ssot-interview.schema.json",
       "role": "schema",
-      "digest": "sha256:21b97db6ba4c142e9d928e9aec47ff36601a4261edc61ee9ccab1862206da07a"
+      "digest": "sha256:922f26741a07ae146ee67fee355f8fe87d17f7b5e6499ef794f5f3a8f2504911"
     },
     {
       "path": "schemas/project-ssot-evidence-index.schema.json",
       "role": "schema",
-      "digest": "sha256:ace28350c09981f9ad250415cdb7b2ccf8b2b453639d639074a73b942f232fc0"
+      "digest": "sha256:d8edb2ecd2269022e4652e8cb87ee481d3d5eee41ae2bb375d0dae7f8ffac4ec"
     },
     {
       "path": "questions/interview.json",
