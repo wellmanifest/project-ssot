@@ -1,5 +1,5 @@
 {
-  "schema": "wellmanifest.project-ssot/v1",
+  "schema": "wellmanifest.project-ssot/v2",
   "id": "wellmanifest.ssot",
   "name": "Wellmanifest SSOT decision DSL",
   "version": "0.2.0-dev",
@@ -166,6 +166,54 @@
     "kind": "none"
   },
   "questions": [],
+  "capability": {
+    "verbs": [
+      "analyze",
+      "validate",
+      "generate"
+    ],
+    "useWhen": [
+      "you must decide which of several duplicated trees is canonical, and record why",
+      "you need a typed project description an agent can consume instead of prose"
+    ],
+    "doNotUseWhen": [
+      "you want the repository crawled or edited - this pack is propose-only and never writes",
+      "you only need git state or freshness across a fleet - reach for a repository auditor instead"
+    ],
+    "keywords": [
+      "ssot",
+      "interview",
+      "propose-only",
+      "duplication",
+      "placement"
+    ],
+    "stacks": [
+      "python"
+    ],
+    "install": {
+      "status": "src-only"
+    },
+    "maturity": {
+      "level": "experimental"
+    },
+    "entrypoints": [
+      {
+        "kind": "module",
+        "name": "project_ssot",
+        "invoke": "PYTHONPATH=src python3 -m project_ssot validate <document>"
+      }
+    ],
+    "siblings": [
+      {
+        "id": "wellmanifest.dsl",
+        "relation": "depends-on"
+      },
+      {
+        "id": "wellmanifest.new-project",
+        "relation": "extends"
+      }
+    ]
+  },
   "receipt": {
     "sourceDigests": [
       {

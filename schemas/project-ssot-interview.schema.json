@@ -20,30 +20,144 @@
     "human_confirmed_debt"
   ],
   "properties": {
-    "$schema": { "type": "string", "format": "uri" },
-    "schema": { "const": "wellmanifest.project-ssot/interview/v1" },
-    "subject_id": { "$ref": "#/$defs/identifier" },
-    "name": { "type": "string", "minLength": 1, "maxLength": 200 },
-    "version": { "$ref": "#/$defs/semver" },
-    "placement": { "$ref": "#/$defs/placement" },
-    "purpose": { "type": "string", "minLength": 1, "maxLength": 400 },
+    "$schema": {
+      "type": "string",
+      "format": "uri"
+    },
+    "schema": {
+      "const": "wellmanifest.project-ssot/interview/v1"
+    },
+    "subject_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "placement": {
+      "$ref": "#/$defs/placement"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
     "owners": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
     },
-    "purpose_authority": { "type": "string", "maxLength": 80 },
+    "purpose_authority": {
+      "type": "string",
+      "maxLength": 80
+    },
     "readme_role": {
-      "enum": ["facade", "generated_mirror", "allowed_divergence", "unknown"]
+      "enum": [
+        "facade",
+        "generated_mirror",
+        "allowed_divergence",
+        "unknown"
+      ]
     },
-    "divergence_reason": { "type": "string", "maxLength": 400 },
-    "analyzer_present": { "type": "boolean" },
+    "divergence_reason": {
+      "type": "string",
+      "maxLength": 400
+    },
+    "analyzer_present": {
+      "type": "boolean"
+    },
     "analyzer_kind": {
-      "enum": ["code2llm-toon", "map-toon-yaml", "redup", "other", "none"]
+      "enum": [
+        "code2llm-toon",
+        "map-toon-yaml",
+        "redup",
+        "other",
+        "none"
+      ]
     },
-    "analyzer_noise": { "type": "boolean" },
-    "human_confirmed_debt": { "type": "boolean" }
+    "analyzer_noise": {
+      "type": "boolean"
+    },
+    "human_confirmed_debt": {
+      "type": "boolean"
+    },
+    "capability_verbs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "capability_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "capability_use_when": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "capability_do_not_use_when": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "capability_stacks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "capability_siblings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "capability_install_status": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "capability_install_package": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "capability_entrypoint": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "capability_maturity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    }
   },
   "$defs": {
     "identifier": {
@@ -57,10 +171,18 @@
       "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
     },
     "home": {
-      "enum": ["wellmanifest", "subactor", "semcod"]
+      "enum": [
+        "wellmanifest",
+        "subactor",
+        "semcod"
+      ]
     },
     "shape": {
-      "enum": ["domain_pack", "runtime_service", "both"]
+      "enum": [
+        "domain_pack",
+        "runtime_service",
+        "both"
+      ]
     },
     "adoptId": {
       "type": "string",
@@ -71,16 +193,27 @@
     "placement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["home", "shape"],
+      "required": [
+        "home",
+        "shape"
+      ],
       "description": "Same object as new-project intent.placement. ADOPT is not HOME. runtime_service must not HOME wellmanifest. runtimeOwner omitted inherits home.",
       "properties": {
-        "home": { "$ref": "#/$defs/home" },
-        "shape": { "$ref": "#/$defs/shape" },
-        "runtimeOwner": { "$ref": "#/$defs/home" },
+        "home": {
+          "$ref": "#/$defs/home"
+        },
+        "shape": {
+          "$ref": "#/$defs/shape"
+        },
+        "runtimeOwner": {
+          "$ref": "#/$defs/home"
+        },
         "adopt": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/adoptId" }
+          "items": {
+            "$ref": "#/$defs/adoptId"
+          }
         }
       }
     }

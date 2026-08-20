@@ -1,0 +1,14 @@
+{
+  "schema": "wellmanifest.project-ssot/home-registry/v1",
+  "description": "Known placement HOMEs. This registry exists so that adopting the standard does not require editing its schemas. An org absent from this list is not invalid by construction; a validator MAY warn, but MUST NOT reject solely on absence.",
+  "policy": {
+    "unknownHome": "warn",
+    "idPattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+  },
+  "homes": [
+    { "id": "wellmanifest", "kind": "standards", "note": "Abstract, project-agnostic standards. MUST NOT home a runtime_service." },
+    { "id": "subactor",     "kind": "product",   "note": "Product organization." },
+    { "id": "semcod",       "kind": "tooling",   "note": "Developer tooling organization." },
+    { "id": "autogrammar",  "kind": "tooling",   "note": "Grammar/DSL tooling organization." }
+  ]
+}

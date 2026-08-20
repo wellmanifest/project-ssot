@@ -19,7 +19,9 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 
-SCHEMA_DOCUMENT = "wellmanifest.project-ssot/v1"
+SCHEMA_DOCUMENT = "wellmanifest.project-ssot/v2"
+SCHEMA_DOCUMENT_V1 = "wellmanifest.project-ssot/v1"
+SCHEMA_DOCUMENTS = (SCHEMA_DOCUMENT, SCHEMA_DOCUMENT_V1)
 SCHEMA_INTERVIEW = "wellmanifest.project-ssot/interview/v1"
 SCHEMA_EVIDENCE = "wellmanifest.project-ssot/evidence-index/v1"
 SCHEMA_CHECK = "wellmanifest.project-ssot/check-result/v1"
@@ -32,8 +34,49 @@ RELATIVE_PATH = re.compile(r"^(?!/)(?!.*(?:^|/)\.\.(?:/|$))(?!.*\\).+$")
 ADOPT_ID = re.compile(r"^wellmanifest/[a-z0-9][a-z0-9-]*$")
 DIGEST = re.compile(r"^sha256:[a-f0-9]{64}$")
 
-HOMES = {"wellmanifest", "subactor", "semcod"}
+HOME_ID = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
+
+#: Fallback used only when registry/homes.json is unreadable. HOME is deliberately
+#: NOT a closed enum: a standard whose schema hardcodes its own adopters cannot be
+#: adopted by a fourth party. An unknown-but-well-formed home is a warning.
+DEFAULT_HOMES = ("wellmanifest", "subactor", "semcod", "autogrammar")
+
+
+def load_homes(path: Path | None = None) -> set[str]:
+    """Known placement HOMEs, from registry/homes.json."""
+    target = path or (repo_root() / "registry" / "homes.json")
+    try:
+        document = load_json(target)
+        homes = {
+            str(entry["id"])
+            for entry in document.get("homes", [])
+            if isinstance(entry, Mapping) and entry.get("id")
+        }
+        return homes or set(DEFAULT_HOMES)
+    except (OSError, ValueError, KeyError, TypeError):
+        return set(DEFAULT_HOMES)
+
+
+HOMES = set(DEFAULT_HOMES)
 SHAPES = {"domain_pack", "runtime_service", "both"}
+CAPABILITY_VERBS = {
+    "analyze", "audit", "discover", "index", "query",
+    "generate", "transform", "convert", "document", "package",
+    "validate", "test", "lint", "repair", "refactor",
+    "plan", "orchestrate", "execute", "schedule",
+    "deploy", "serve", "monitor", "publish", "sync",
+}
+CAPABILITY_IO_KINDS = {
+    "directory", "repository", "file", "json", "yaml", "markdown",
+    "sqlite", "protobuf", "http", "stream", "stdout", "database", "other",
+}
+ENTRYPOINT_KINDS = {"cli", "module", "http", "library", "make", "script"}
+INSTALL_STATUSES = {"pypi", "npm", "binary", "src-only", "container", "none"}
+MATURITY_LEVELS = {"experimental", "beta", "stable", "maintenance", "deprecated"}
+SIBLING_RELATIONS = {
+    "invokes", "extends", "overlaps", "superseded-by", "supersedes",
+    "exports-to", "facade-of", "depends-on", "alternative-to",
+}
 PLACEMENT_KEYS = {"home", "shape", "runtimeOwner", "adopt"}
 README_ROLES = {"facade", "generated_mirror", "allowed_divergence", "unknown"}
 ANALYZER_KINDS = {"code2llm-toon", "map-toon-yaml", "redup", "other", "none"}
@@ -284,8 +327,17 @@ def placement_findings(value: Any, path: str = "$.placement") -> list[Finding]:
     if not isinstance(value, dict) or not required <= set(value) or not set(value) <= allowed:
         return [Finding("PROJECT-HOME-001", "placement must contain home and shape", path)]
     findings: list[Finding] = []
-    if value["home"] not in HOMES:
-        findings.append(Finding("PROJECT-HOME-001", "placement home is invalid", f"{path}.home"))
+    home_value = value["home"]
+    if not isinstance(home_value, str) or not HOME_ID.match(home_value):
+        findings.append(Finding("PROJECT-HOME-001", "placement home is not a well-formed id", f"{path}.home"))
+    elif home_value not in load_homes():
+        findings.append(
+            Finding(
+                "PROJECT-HOME-002",
+                f"home {home_value!r} is not in registry/homes.json; add it there rather than editing schemas",
+                f"{path}.home",
+            )
+        )
     if value["shape"] not in SHAPES:
         findings.append(Finding("PROJECT-SHAPE-001", "placement shape is invalid", f"{path}.shape"))
     runtime_owner = value.get("runtimeOwner")
@@ -531,6 +583,16 @@ def validate_interview(document: Mapping[str, Any], *, partial: bool = False) ->
         "analyzer_kind",
         "analyzer_noise",
         "human_confirmed_debt",
+        "capability_verbs",
+        "capability_keywords",
+        "capability_use_when",
+        "capability_do_not_use_when",
+        "capability_install_status",
+        "capability_install_package",
+        "capability_entrypoint",
+        "capability_maturity",
+        "capability_stacks",
+        "capability_siblings",
     })
     if unknown:
         findings.append(
@@ -827,6 +889,72 @@ def _receipt(sources: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
     return {"sourceDigests": digests}
 
 
+def _capability_from_answers(answers: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Compose the v2 capability block from interview answers.
+
+    Returns None when the human-only fields are unanswered: composition is
+    propose-only, so an unanswered capability yields a v1 document plus a
+    question, never an invented capability.
+    """
+
+    def _list(key: str) -> list[str]:
+        raw = answers.get(key)
+        if isinstance(raw, str):
+            raw = [part.strip() for part in raw.split(",")]
+        if not isinstance(raw, list):
+            return []
+        return [str(item).strip() for item in raw if str(item).strip()]
+
+    verbs = _list("capability_verbs")
+    use_when = _list("capability_use_when")
+    do_not = _list("capability_do_not_use_when")
+    if not (verbs and use_when and do_not):
+        return None
+
+    capability: dict[str, Any] = {
+        "verbs": verbs,
+        "useWhen": use_when,
+        "doNotUseWhen": do_not,
+    }
+    for key, field in (("capability_keywords", "keywords"), ("capability_stacks", "stacks")):
+        values = _list(key)
+        if values:
+            capability[field] = values
+
+    status = answers.get("capability_install_status")
+    if isinstance(status, str) and status.strip():
+        install: dict[str, str] = {"status": status.strip()}
+        package = answers.get("capability_install_package")
+        if isinstance(package, str) and package.strip():
+            install["package"] = package.strip()
+        capability["install"] = install
+
+    level = answers.get("capability_maturity")
+    if isinstance(level, str) and level.strip():
+        capability["maturity"] = {"level": level.strip()}
+
+    entrypoint = answers.get("capability_entrypoint")
+    if isinstance(entrypoint, str) and entrypoint.count(":") >= 2:
+        kind, name, invoke = entrypoint.split(":", 2)
+        if kind.strip() and name.strip() and invoke.strip():
+            capability["entrypoints"] = [
+                {"kind": kind.strip(), "name": name.strip(), "invoke": invoke.strip()}
+            ]
+
+    siblings: list[dict[str, str]] = []
+    for spec in _list("capability_siblings"):
+        parts = [part.strip() for part in spec.split(":")]
+        if len(parts) >= 2 and parts[0] and parts[1]:
+            entry = {"id": parts[0], "relation": parts[1]}
+            if len(parts) > 2 and parts[2]:
+                entry["target"] = parts[2]
+            siblings.append(entry)
+    if siblings:
+        capability["siblings"] = siblings
+
+    return capability
+
+
 def classify(
     answers: Mapping[str, Any] | None = None,
     evidence: Mapping[str, Any] | None = None,
@@ -974,8 +1102,15 @@ def classify(
         version = "0.1.0"
         questions.append("version from evidence is not SemVer; declare it in the interview.")
 
+    capability = _capability_from_answers(answers or {})
+    if capability is None:
+        questions.append(
+            "capability.verbs/useWhen/doNotUseWhen are unanswered; the document stays at "
+            "wellmanifest.project-ssot/v1 and is not map-ready until the interview fills them."
+        )
+
     document: dict[str, Any] = {
-        "schema": SCHEMA_DOCUMENT,
+        "schema": SCHEMA_DOCUMENT if capability else SCHEMA_DOCUMENT_V1,
         "id": subject,
         "name": name,
         "version": version,
@@ -1008,6 +1143,8 @@ def classify(
         "packaging": _packaging(sources),
         "questions": questions,
     }
+    if capability:
+        document["capability"] = capability
     receipt = _receipt(sources)
     if receipt:
         document["receipt"] = receipt
@@ -1019,10 +1156,172 @@ def classify(
     return document
 
 
+CAPABILITY_KEYS = {
+    "verbs", "keywords", "inputs", "outputs", "entrypoints", "install",
+    "maturity", "siblings", "useWhen", "doNotUseWhen", "stacks", "workstreamHints",
+}
+
+
+def _string_list_findings(
+    value: Any, path: str, code: str, *, minimum: int = 0, maximum: int = 64
+) -> list[Finding]:
+    if value is None:
+        if minimum:
+            return [Finding(code, f"{path} is required", path)]
+        return []
+    if not isinstance(value, list) or any(not isinstance(item, str) or not item.strip() for item in value):
+        return [Finding(code, f"{path} must be a list of non-empty strings", path)]
+    if len(value) < minimum:
+        return [Finding(code, f"{path} needs at least {minimum} entry/entries", path)]
+    if len(value) > maximum:
+        return [Finding(code, f"{path} must hold at most {maximum} entries", path)]
+    if len(set(value)) != len(value):
+        return [Finding(code, f"{path} must not repeat entries", path)]
+    return []
+
+
+def capability_findings(value: Any, schema_id: str | None = None) -> list[Finding]:
+    """Validate the v2 capability block.
+
+    The block is what lets a consumer decide whether to use this project at all.
+    verbs/useWhen/doNotUseWhen are required because no analyzer can derive them and
+    a wrong guess is exactly what makes a consumer pick the wrong project.
+    """
+    path = "$.capability"
+    if value is None:
+        if schema_id == SCHEMA_DOCUMENT:
+            return [
+                Finding(
+                    "PROJECT-CAPABILITY-001",
+                    "capability block is required by wellmanifest.project-ssot/v2",
+                    path,
+                )
+            ]
+        return []
+    if not isinstance(value, Mapping):
+        return [Finding("PROJECT-CAPABILITY-001", "capability must be an object", path)]
+
+    findings: list[Finding] = []
+    unknown = sorted(set(value) - CAPABILITY_KEYS)
+    if unknown:
+        findings.append(
+            Finding("PROJECT-CAPABILITY-001", f"unknown capability fields {unknown} (unknownPolicy=reject)", path)
+        )
+
+    verbs = value.get("verbs")
+    if not isinstance(verbs, list) or not verbs:
+        findings.append(Finding("PROJECT-CAPABILITY-001", "at least one capability verb is required", f"{path}.verbs"))
+    else:
+        if len(verbs) > 8:
+            findings.append(
+                Finding("PROJECT-CAPABILITY-001", "at most 8 verbs; a project doing more is under-decomposed", f"{path}.verbs")
+            )
+        for index, verb in enumerate(verbs):
+            if verb not in CAPABILITY_VERBS:
+                findings.append(
+                    Finding("PROJECT-CAPABILITY-001", f"unknown capability verb {verb!r}", f"{path}.verbs[{index}]")
+                )
+
+    findings.extend(_string_list_findings(value.get("keywords"), f"{path}.keywords", "PROJECT-CAPABILITY-001", maximum=12))
+    findings.extend(
+        _string_list_findings(value.get("useWhen"), f"{path}.useWhen", "PROJECT-CAPABILITY-002", minimum=1, maximum=6)
+    )
+    findings.extend(
+        _string_list_findings(
+            value.get("doNotUseWhen"), f"{path}.doNotUseWhen", "PROJECT-CAPABILITY-002", minimum=1, maximum=6
+        )
+    )
+    findings.extend(_string_list_findings(value.get("stacks"), f"{path}.stacks", "PROJECT-CAPABILITY-001"))
+
+    for key in ("inputs", "outputs"):
+        items = value.get(key)
+        if items is None:
+            continue
+        if not isinstance(items, list):
+            findings.append(Finding("PROJECT-CAPABILITY-001", f"{key} must be a list", f"{path}.{key}"))
+            continue
+        for index, item in enumerate(items):
+            where = f"{path}.{key}[{index}]"
+            if not isinstance(item, Mapping) or item.get("kind") not in CAPABILITY_IO_KINDS:
+                findings.append(Finding("PROJECT-CAPABILITY-001", f"unknown {key} kind", where))
+
+    entrypoints = value.get("entrypoints")
+    if entrypoints is not None:
+        if not isinstance(entrypoints, list):
+            findings.append(Finding("PROJECT-CAPABILITY-003", "entrypoints must be a list", f"{path}.entrypoints"))
+        else:
+            for index, item in enumerate(entrypoints):
+                where = f"{path}.entrypoints[{index}]"
+                if not isinstance(item, Mapping):
+                    findings.append(Finding("PROJECT-CAPABILITY-003", "entrypoint must be an object", where))
+                    continue
+                if item.get("kind") not in ENTRYPOINT_KINDS:
+                    findings.append(Finding("PROJECT-CAPABILITY-003", "unknown entrypoint kind", f"{where}.kind"))
+                for field in ("name", "invoke"):
+                    if not isinstance(item.get(field), str) or not item.get(field, "").strip():
+                        findings.append(Finding("PROJECT-CAPABILITY-003", f"entrypoint {field} is required", f"{where}.{field}"))
+                declared = item.get("declaredIn")
+                if declared is not None and not _is_path(declared):
+                    findings.append(Finding("PROJECT-CAPABILITY-003", "declaredIn must be a repo-relative path", f"{where}.declaredIn"))
+
+    install = value.get("install")
+    if install is not None:
+        if not isinstance(install, Mapping) or install.get("status") not in INSTALL_STATUSES:
+            findings.append(Finding("PROJECT-CAPABILITY-001", "unknown install status", f"{path}.install"))
+        elif install.get("status") in {"pypi", "npm", "container"} and not install.get("package"):
+            findings.append(
+                Finding("PROJECT-CAPABILITY-001", "a published install status must name the package", f"{path}.install.package")
+            )
+
+    maturity = value.get("maturity")
+    if maturity is not None:
+        if not isinstance(maturity, Mapping) or maturity.get("level") not in MATURITY_LEVELS:
+            findings.append(Finding("PROJECT-CAPABILITY-001", "unknown maturity level", f"{path}.maturity"))
+
+    siblings = value.get("siblings")
+    if siblings is not None:
+        if not isinstance(siblings, list):
+            findings.append(Finding("PROJECT-CAPABILITY-004", "siblings must be a list", f"{path}.siblings"))
+        else:
+            for index, item in enumerate(siblings):
+                where = f"{path}.siblings[{index}]"
+                if not isinstance(item, Mapping):
+                    findings.append(Finding("PROJECT-CAPABILITY-004", "sibling must be an object", where))
+                    continue
+                if not _is_identifier(item.get("id")):
+                    findings.append(Finding("PROJECT-CAPABILITY-004", "sibling id must be an identifier", f"{where}.id"))
+                relation = item.get("relation")
+                if relation not in SIBLING_RELATIONS:
+                    findings.append(Finding("PROJECT-CAPABILITY-004", f"unknown sibling relation {relation!r}", f"{where}.relation"))
+                if relation in {"superseded-by", "supersedes"} and not _is_identifier(item.get("target")):
+                    findings.append(
+                        Finding(
+                            "PROJECT-CAPABILITY-004",
+                            f"{relation} must name the other project in target",
+                            f"{where}.target",
+                        )
+                    )
+
+    hints = value.get("workstreamHints")
+    if hints is not None:
+        if not isinstance(hints, Mapping):
+            findings.append(Finding("PROJECT-CAPABILITY-001", "workstreamHints must be an object", f"{path}.workstreamHints"))
+        else:
+            for key, globs in hints.items():
+                findings.extend(
+                    _string_list_findings(globs, f"{path}.workstreamHints.{key}", "PROJECT-CAPABILITY-001", minimum=1)
+                )
+
+    return findings
+
+
 def validate_decision(document: Mapping[str, Any]) -> list[Finding]:
     findings: list[Finding] = []
-    if document.get("schema") != SCHEMA_DOCUMENT:
-        findings.append(Finding("PROJECT-KIND-001", "schema must be wellmanifest.project-ssot/v1"))
+    schema_id = document.get("schema")
+    if schema_id not in SCHEMA_DOCUMENTS:
+        findings.append(
+            Finding("PROJECT-KIND-001", f"schema must be one of {', '.join(SCHEMA_DOCUMENTS)}")
+        )
     allowed = {
         "$schema",
         "schema",
@@ -1040,6 +1339,7 @@ def validate_decision(document: Mapping[str, Any]) -> list[Finding]:
         "receipt",
         "conflicts",
         "questions",
+        "capability",
     }
     unknown = sorted(set(document) - allowed)
     if unknown:
@@ -1195,7 +1495,20 @@ def validate_decision(document: Mapping[str, Any]) -> list[Finding]:
         if not isinstance(packaging, dict) or packaging.get("kind") not in PACKAGING_KINDS:
             findings.append(Finding("PROJECT-KIND-001", "unknown packaging kind", "$.packaging"))
 
+    findings.extend(capability_findings(document.get("capability"), schema_id))
+
     return findings
+
+
+def _io_suffix(item: Mapping[str, Any]) -> str:
+    parts = []
+    if item.get("path"):
+        parts.append(f"path={item['path']}")
+    if item.get("schema"):
+        parts.append(f"schema={item['schema']}")
+    if item.get("note"):
+        parts.append(f"note={_quote(item['note'])}")
+    return (" " + " ".join(parts)) if parts else ""
 
 
 def _quote(value: str) -> str:
@@ -1268,6 +1581,41 @@ def render_dsl(document: Mapping[str, Any]) -> str:
         known = item.get("knownDivergent") or {}
         if known.get("reason"):
             lines.append(f"  REASON {_quote(known['reason'])}")
+    capability = document.get("capability") or {}
+    if capability:
+        lines.append("")
+        lines.append("CAPABILITY")
+        for verb in capability.get("verbs") or []:
+            lines.append(f"  VERB {verb}")
+        for keyword in capability.get("keywords") or []:
+            lines.append(f"  KEYWORD {_quote(keyword)}")
+        for stack in capability.get("stacks") or []:
+            lines.append(f"  STACK {stack}")
+        for item in capability.get("inputs") or []:
+            lines.append(f"  INPUT {item['kind']}{_io_suffix(item)}")
+        for item in capability.get("outputs") or []:
+            lines.append(f"  OUTPUT {item['kind']}{_io_suffix(item)}")
+        for item in capability.get("entrypoints") or []:
+            declared = f" declaredIn={item['declaredIn']}" if item.get("declaredIn") else ""
+            lines.append(f"  ENTRYPOINT {item['kind']} {item['name']} {_quote(item['invoke'])}{declared}")
+        install = capability.get("install") or {}
+        if install:
+            package = f" {install['package']}" if install.get("package") else ""
+            lines.append(f"  INSTALL {install['status']}{package}")
+        maturity = capability.get("maturity") or {}
+        if maturity:
+            grade = f" {maturity['grade']}" if maturity.get("grade") else ""
+            lines.append(f"  MATURITY {maturity['level']}{grade}")
+        for item in capability.get("siblings") or []:
+            target = f" {item['target']}" if item.get("target") else ""
+            lines.append(f"  SIBLING {item['id']} {item['relation']}{target}")
+        for entry in capability.get("useWhen") or []:
+            lines.append(f"  USE_WHEN {_quote(entry)}")
+        for entry in capability.get("doNotUseWhen") or []:
+            lines.append(f"  DO_NOT_USE_WHEN {_quote(entry)}")
+        for name, globs in (capability.get("workstreamHints") or {}).items():
+            for glob in globs:
+                lines.append(f"  WORKSTREAM {name} {_quote(glob)}")
     packaging = document.get("packaging") or {}
     if packaging:
         lines.append("")
@@ -1299,6 +1647,32 @@ def _unquote(value: str) -> str:
     if len(text) >= 2 and text[0] == text[-1] == '"':
         return bytes(text[1:-1], "utf-8").decode("unicode_escape")
     return text
+
+
+def _parse_io(rest: str) -> dict[str, Any]:
+    kind, _, extra = rest.partition(" ")
+    item: dict[str, Any] = {"kind": kind}
+    for key in ("path", "schema", "note"):
+        marker = f"{key}="
+        if marker in extra:
+            value = extra.split(marker, 1)[1]
+            if key == "note":
+                item[key] = _unquote(value.strip())
+            else:
+                item[key] = value.split(" ")[0]
+    return item
+
+
+def _parse_entrypoint(rest: str) -> dict[str, Any]:
+    kind, _, remainder = rest.partition(" ")
+    name, _, remainder = remainder.partition(" ")
+    declared = None
+    if " declaredIn=" in remainder:
+        remainder, _, declared = remainder.partition(" declaredIn=")
+    item: dict[str, Any] = {"kind": kind, "name": name, "invoke": _unquote(remainder.strip())}
+    if declared:
+        item["declaredIn"] = declared.strip()
+    return item
 
 
 def parse_dsl(text: str) -> dict[str, Any]:
@@ -1367,6 +1741,9 @@ def parse_dsl(text: str) -> dict[str, Any]:
                 section = "relation"
                 current = {"id": rest}
                 document["relations"].append(current)
+            elif head == "CAPABILITY":
+                section = "capability"
+                current = document.setdefault("capability", {})
             elif head == "PACKAGING":
                 kind, _, path = rest.partition(" ")
                 packaging = {"kind": kind}
@@ -1389,6 +1766,45 @@ def parse_dsl(text: str) -> dict[str, Any]:
             elif head == "QUESTIONS":
                 section = "questions"
                 current = document
+            continue
+
+        if section == "capability" and current is not None:
+            if head == "VERB":
+                current.setdefault("verbs", []).append(rest)
+            elif head == "KEYWORD":
+                current.setdefault("keywords", []).append(_unquote(rest))
+            elif head == "STACK":
+                current.setdefault("stacks", []).append(rest)
+            elif head in {"INPUT", "OUTPUT"}:
+                current.setdefault(head.lower() + "s", []).append(_parse_io(rest))
+            elif head == "ENTRYPOINT":
+                current.setdefault("entrypoints", []).append(_parse_entrypoint(rest))
+            elif head == "INSTALL":
+                status, _, package = rest.partition(" ")
+                install = {"status": status}
+                if package:
+                    install["package"] = package
+                current["install"] = install
+            elif head == "MATURITY":
+                level, _, grade = rest.partition(" ")
+                maturity = {"level": level}
+                if grade:
+                    maturity["grade"] = grade
+                current["maturity"] = maturity
+            elif head == "SIBLING":
+                parts = rest.split()
+                if len(parts) >= 2:
+                    sibling = {"id": parts[0], "relation": parts[1]}
+                    if len(parts) > 2:
+                        sibling["target"] = parts[2]
+                    current.setdefault("siblings", []).append(sibling)
+            elif head == "USE_WHEN":
+                current.setdefault("useWhen", []).append(_unquote(rest))
+            elif head == "DO_NOT_USE_WHEN":
+                current.setdefault("doNotUseWhen", []).append(_unquote(rest))
+            elif head == "WORKSTREAM":
+                name, _, glob = rest.partition(" ")
+                current.setdefault("workstreamHints", {}).setdefault(name, []).append(_unquote(glob))
             continue
 
         if section == "placement" and current is not None:

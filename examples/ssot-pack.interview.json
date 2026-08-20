@@ -14,12 +14,44 @@
     ]
   },
   "purpose": "Interview-driven classification of duplicated trees into propose-only SSOT decisions",
-  "owners": ["github:wellmanifest/ssot"],
+  "owners": [
+    "github:wellmanifest/ssot"
+  ],
   "purpose_authority": "dsl-manifest",
   "readme_role": "facade",
   "divergence_reason": "Polish README intro and English marketing tone may differ from the schema purpose; the JSON AST remains canonical.",
   "analyzer_present": true,
   "analyzer_kind": "code2llm-toon",
   "analyzer_noise": true,
-  "human_confirmed_debt": false
+  "human_confirmed_debt": false,
+  "capability_verbs": [
+    "analyze",
+    "validate",
+    "generate"
+  ],
+  "capability_keywords": [
+    "ssot",
+    "interview",
+    "propose-only",
+    "duplication",
+    "placement"
+  ],
+  "capability_use_when": [
+    "you must decide which of several duplicated trees is canonical, and record why",
+    "you need a typed project description an agent can consume instead of prose"
+  ],
+  "capability_do_not_use_when": [
+    "you want the repository crawled or edited - this pack is propose-only and never writes",
+    "you only need git state or freshness across a fleet - reach for a repository auditor instead"
+  ],
+  "capability_install_status": "src-only",
+  "capability_entrypoint": "module:project_ssot:PYTHONPATH=src python3 -m project_ssot validate <document>",
+  "capability_maturity": "experimental",
+  "capability_stacks": [
+    "python"
+  ],
+  "capability_siblings": [
+    "wellmanifest.dsl:depends-on",
+    "wellmanifest.new-project:extends"
+  ]
 }

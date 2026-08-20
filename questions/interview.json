@@ -24,23 +24,30 @@
     },
     {
       "id": "home",
-      "prompt": "placement.home: which org HOMEs this repository? (wellmanifest | subactor | semcod). \"w ramach wellmanifest\" means ADOPT, not HOME.",
-      "type": "enum",
-      "choices": ["wellmanifest", "subactor", "semcod"],
+      "prompt": "placement.home: which org HOMEs this repository? Use an id from registry/homes.json (add yours there rather than editing schemas). \"w ramach wellmanifest\" means ADOPT, not HOME.",
+      "type": "string",
       "required": true
     },
     {
       "id": "shape",
       "prompt": "placement.shape: domain_pack | runtime_service | both. runtime_service must not HOME wellmanifest.",
       "type": "enum",
-      "choices": ["domain_pack", "runtime_service", "both"],
+      "choices": [
+        "domain_pack",
+        "runtime_service",
+        "both"
+      ],
       "required": true
     },
     {
       "id": "runtimeOwner",
       "prompt": "placement.runtimeOwner: who runs the CLI/daemon? Same enum as home. Empty inherits home. wellmanifest does not host product daemons.",
       "type": "enum",
-      "choices": ["wellmanifest", "subactor", "semcod"],
+      "choices": [
+        "wellmanifest",
+        "subactor",
+        "semcod"
+      ],
       "required": false
     },
     {
@@ -71,7 +78,12 @@
       "id": "readme_role",
       "prompt": "How does README relate to this document?",
       "type": "enum",
-      "choices": ["facade", "generated_mirror", "allowed_divergence", "unknown"],
+      "choices": [
+        "facade",
+        "generated_mirror",
+        "allowed_divergence",
+        "unknown"
+      ],
       "required": true
     },
     {
@@ -90,7 +102,13 @@
       "id": "analyzer_kind",
       "prompt": "If yes, which analyzer? (code2llm-toon, map-toon-yaml, redup, other, none)",
       "type": "enum",
-      "choices": ["code2llm-toon", "map-toon-yaml", "redup", "other", "none"],
+      "choices": [
+        "code2llm-toon",
+        "map-toon-yaml",
+        "redup",
+        "other",
+        "none"
+      ],
       "required": true
     },
     {
@@ -104,6 +122,66 @@
       "prompt": "Has a human confirmed analyzer hits are real description debt, not noise?",
       "type": "bool",
       "required": true
+    },
+    {
+      "id": "capability_verbs",
+      "prompt": "capability.verbs: what does this project DO? 1-8 from: analyze, audit, discover, index, query, generate, transform, convert, document, package, validate, test, lint, repair, refactor, plan, orchestrate, execute, schedule, deploy, serve, monitor, publish, sync.",
+      "type": "string-list",
+      "required": true
+    },
+    {
+      "id": "capability_keywords",
+      "prompt": "capability.keywords: up to 12 discriminating terms. Not the category - the words that tell this project apart from its siblings.",
+      "type": "string-list",
+      "required": false
+    },
+    {
+      "id": "capability_use_when",
+      "prompt": "capability.useWhen: 1-6 concrete situations where this is the right project to reach for.",
+      "type": "string-list",
+      "required": true
+    },
+    {
+      "id": "capability_do_not_use_when",
+      "prompt": "capability.doNotUseWhen: 1-6 situations where reaching for this is a mistake, and what to reach for instead. Name the misreading its own name invites.",
+      "type": "string-list",
+      "required": true
+    },
+    {
+      "id": "capability_install_status",
+      "prompt": "capability.install.status: how does a consumer obtain a working invocation? (pypi | npm | binary | src-only | container | none). src-only means PYTHONPATH or equivalent is required.",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "capability_install_package",
+      "prompt": "capability.install.package: the published package name, if status is pypi/npm/container.",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "capability_entrypoint",
+      "prompt": "capability.entrypoints: the primary way to run it, as 'kind:name:invoke' (e.g. cli:diagit:diagit audit --root ~/github).",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "capability_maturity",
+      "prompt": "capability.maturity.level: experimental | beta | stable | maintenance | deprecated.",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "capability_stacks",
+      "prompt": "capability.stacks: stack profile ids this project belongs to (feeds intent.json stacks).",
+      "type": "string-list",
+      "required": false
+    },
+    {
+      "id": "capability_siblings",
+      "prompt": "capability.siblings: related projects as 'id:relation[:target]' (relations: invokes, extends, overlaps, superseded-by, supersedes, exports-to, facade-of, depends-on, alternative-to).",
+      "type": "string-list",
+      "required": false
     }
   ]
 }

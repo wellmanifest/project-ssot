@@ -3,7 +3,7 @@
   "schema": "wellmanifest.dsl/manifest/v1",
   "id": "wellmanifest.project-ssot",
   "name": "Wellmanifest project description SSOT",
-  "version": "0.1.0-dev",
+  "version": "0.2.0-dev",
   "status": "experimental",
   "purpose": "Interview-driven composition of a single project description from typed evidence. Propose-only. Does not crawl a live repository.",
   "domain": "software-project-ssot",
@@ -27,68 +27,49 @@
     "selectors": []
   },
   "ownedPaths": [
-    "dsl-manifest.json",
-    "schemas/**",
-    "questions/**",
     "docs/**",
-    "src/project_ssot.py",
-    "examples/**"
+    "dsl-manifest.json",
+    "examples/**",
+    "questions/**",
+    "registry/**",
+    "schemas/**",
+    "src/project_ssot.py"
   ],
   "artifacts": [
-    {
-      "path": "schemas/project-ssot.schema.json",
-      "role": "normative-source",
-      "digest": "sha256:2a6582a96bb9fe12725cb4d6cd9b09c3f452607e05a0c8dca2c696c05ea2becd"
-    },
-    {
-      "path": "schemas/project-ssot-interview.schema.json",
-      "role": "schema",
-      "digest": "sha256:922f26741a07ae146ee67fee355f8fe87d17f7b5e6499ef794f5f3a8f2504911"
-    },
-    {
-      "path": "schemas/project-ssot-evidence-index.schema.json",
-      "role": "schema",
-      "digest": "sha256:d8edb2ecd2269022e4652e8cb87ee481d3d5eee41ae2bb375d0dae7f8ffac4ec"
-    },
-    {
-      "path": "questions/interview.json",
-      "role": "profile",
-      "digest": "sha256:610075a932db24af28733ffc94b9dd0f8f7b805df518b75aedb8ce68996ac73f"
-    },
-    {
-      "path": "src/project_ssot.py",
-      "role": "parser-contract",
-      "digest": "sha256:5d9af16588a5e82e2888d786261230b221f046a14feaf31e06cf2660ab729ffd"
-    },
-    {
-      "path": "docs/PROJECT.md",
-      "role": "documentation",
-      "digest": "sha256:40b29ab412c24420da5ddc7abc011f19da4c940d1f0fcd3b4da1f663aacb4a38"
-    },
-    {
-      "path": "docs/INTERVIEW.md",
-      "role": "documentation",
-      "digest": "sha256:4f6ac025de911472b828876e0ff3af96bf5af849bdd5e94f185f8924aba3d3e3"
-    },
     {
       "path": "docs/CLASSIFY.md",
       "role": "documentation",
       "digest": "sha256:3fbefa5fdab0ec1cdbde377eab5e48e2f5e6a4e8a46772471ea7371799764012"
     },
     {
-      "path": "docs/SUGGEST.md",
+      "path": "docs/CRITICAL/PROJECT-HOME-001.md",
       "role": "documentation",
-      "digest": "sha256:7ae8d92ccffe7d7d571732c4e57516a2cabbc30fb0706dd9ae563f977f5da5d5"
+      "digest": "sha256:fac8306156fe87511a18ecd4afa55312c3c499750d3066977925af7ba3852081"
     },
     {
-      "path": "docs/VALIDATE.md",
+      "path": "docs/ERROR/PROJECT-ADOPT-001.md",
       "role": "documentation",
-      "digest": "sha256:a8ba41d347e7d19342ca537dfcfd71b9d8242ed6337e2c3a519a8e84a802f7ce"
+      "digest": "sha256:4114f180f54710c563b437616fa326c7f2d64e2f83297c18a1125758d1df774f"
     },
     {
-      "path": "docs/ERROR/PROJECT-KIND-001.md",
+      "path": "docs/ERROR/PROJECT-CAPABILITY-001.md",
       "role": "documentation",
-      "digest": "sha256:af6a9414276f6d55d5a975f6677a43207b1cc6ca2ab59fbe995d7f5d275a9014"
+      "digest": "sha256:661018ad7509c1407fb848b116f6de26e0792a0728c34ab877bc9038361ebe85"
+    },
+    {
+      "path": "docs/ERROR/PROJECT-CAPABILITY-002.md",
+      "role": "documentation",
+      "digest": "sha256:9751b36f9746c6e633cb063f599a68835c51a5536dfa37e601987943896c2719"
+    },
+    {
+      "path": "docs/ERROR/PROJECT-CAPABILITY-003.md",
+      "role": "documentation",
+      "digest": "sha256:07e2c4896d3ce0044d2c115d7bf1275ce3d039a526508edf7f44f458153ae053"
+    },
+    {
+      "path": "docs/ERROR/PROJECT-CAPABILITY-004.md",
+      "role": "documentation",
+      "digest": "sha256:24bba61d951e2638f347569dfe8821e1cc8cde78bd49de45911380302146363d"
     },
     {
       "path": "docs/ERROR/PROJECT-CONFLICT-001.md",
@@ -101,19 +82,9 @@
       "digest": "sha256:b8beb89f576039d6ed5bf4f027ca241fb71c6f9ced240d847241611b64d0a925"
     },
     {
-      "path": "docs/ERROR/PROJECT-PURPOSE-001.md",
+      "path": "docs/ERROR/PROJECT-KIND-001.md",
       "role": "documentation",
-      "digest": "sha256:55d0d8de553ba438576efd7ffff857104c85573336fd0e6cd617c450e84f3693"
-    },
-    {
-      "path": "docs/ERROR/PROJECT-ADOPT-001.md",
-      "role": "documentation",
-      "digest": "sha256:4114f180f54710c563b437616fa326c7f2d64e2f83297c18a1125758d1df774f"
-    },
-    {
-      "path": "docs/ERROR/PROJECT-README-001.md",
-      "role": "documentation",
-      "digest": "sha256:d0ea58968805976384036a23fa65c1f9ae4e13b0a86d84f8204325acc38576b4"
+      "digest": "sha256:af6a9414276f6d55d5a975f6677a43207b1cc6ca2ab59fbe995d7f5d275a9014"
     },
     {
       "path": "docs/ERROR/PROJECT-NOISE-001.md",
@@ -121,29 +92,89 @@
       "digest": "sha256:c6039a1eb688b72898c8489b51785391cb208add20f025958c03d29c72640ea5"
     },
     {
+      "path": "docs/ERROR/PROJECT-PURPOSE-001.md",
+      "role": "documentation",
+      "digest": "sha256:55d0d8de553ba438576efd7ffff857104c85573336fd0e6cd617c450e84f3693"
+    },
+    {
+      "path": "docs/ERROR/PROJECT-README-001.md",
+      "role": "documentation",
+      "digest": "sha256:d0ea58968805976384036a23fa65c1f9ae4e13b0a86d84f8204325acc38576b4"
+    },
+    {
       "path": "docs/ERROR/PROJECT-SHAPE-001.md",
       "role": "documentation",
       "digest": "sha256:c362c08642a7f15e839c5849166433a8c7e55cfafee9bfcbe44b4c7b4c745e64"
     },
     {
-      "path": "docs/CRITICAL/PROJECT-HOME-001.md",
+      "path": "docs/INTERVIEW.md",
       "role": "documentation",
-      "digest": "sha256:fac8306156fe87511a18ecd4afa55312c3c499750d3066977925af7ba3852081"
+      "digest": "sha256:4f6ac025de911472b828876e0ff3af96bf5af849bdd5e94f185f8924aba3d3e3"
     },
     {
-      "path": "examples/ssot-pack.project.json",
-      "role": "example",
-      "digest": "sha256:7b72e45065330e4b6216bf246d3776a8c0c07e79ac2f6f9f49f5aa5167c23567"
+      "path": "docs/PROJECT.md",
+      "role": "documentation",
+      "digest": "sha256:40b29ab412c24420da5ddc7abc011f19da4c940d1f0fcd3b4da1f663aacb4a38"
+    },
+    {
+      "path": "docs/SUGGEST.md",
+      "role": "documentation",
+      "digest": "sha256:7ae8d92ccffe7d7d571732c4e57516a2cabbc30fb0706dd9ae563f977f5da5d5"
+    },
+    {
+      "path": "docs/VALIDATE.md",
+      "role": "documentation",
+      "digest": "sha256:a8ba41d347e7d19342ca537dfcfd71b9d8242ed6337e2c3a519a8e84a802f7ce"
+    },
+    {
+      "path": "docs/WARN/PROJECT-HOME-002.md",
+      "role": "documentation",
+      "digest": "sha256:951aaab7ea001d0fa0f3219f409119ab95f8186f34ef59bf5d96ce5a747f326a"
     },
     {
       "path": "examples/ssot-pack.project.dsl",
       "role": "example",
-      "digest": "sha256:43d36fa8c5ca823b6f41691f540b1afb2ef9f26000655946f79b083931144019"
+      "digest": "sha256:1a51117f884672ce07ba918daa93ea420d3f97f4330268a1c45c0327a01d9148"
+    },
+    {
+      "path": "examples/ssot-pack.project.json",
+      "role": "example",
+      "digest": "sha256:92b4fb1d1c2105e70a5139165cc55d60fbc89057fade5c642786aa4342040e84"
     },
     {
       "path": "examples/widget.project.json",
       "role": "example",
       "digest": "sha256:51eba1fe6c1a00b94b120efc2871d9b26a64712c55f6df036576c2baee8f90a9"
+    },
+    {
+      "path": "questions/interview.json",
+      "role": "profile",
+      "digest": "sha256:3528d870aa511b99f8e446962cbfaddace0701efdb6b680f864251742e7fc1b6"
+    },
+    {
+      "path": "registry/homes.json",
+      "role": "normative-source",
+      "digest": "sha256:e495b3b4f801592e226cb20521fe2da5b10cd6fdccae436da28f72df2256c335"
+    },
+    {
+      "path": "schemas/project-ssot-evidence-index.schema.json",
+      "role": "schema",
+      "digest": "sha256:d8edb2ecd2269022e4652e8cb87ee481d3d5eee41ae2bb375d0dae7f8ffac4ec"
+    },
+    {
+      "path": "schemas/project-ssot-interview.schema.json",
+      "role": "schema",
+      "digest": "sha256:1aae1a842cdf4126adbfdd62ae283e0fa19b686481baf0b42e6317a23d03601f"
+    },
+    {
+      "path": "schemas/project-ssot.schema.json",
+      "role": "normative-source",
+      "digest": "sha256:df3c87532dd06eba9d189efbff55829410b446aabb5501196b2472cdf3aad5ec"
+    },
+    {
+      "path": "src/project_ssot.py",
+      "role": "parser-contract",
+      "digest": "sha256:c8d3c0c9cf2fd72822a49f8551e4cae2f89919a24c0abb354ed6ffa8463ddf38"
     }
   ],
   "namespaces": [
