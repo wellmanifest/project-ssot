@@ -2,7 +2,7 @@ DOCUMENT PROJECT
 ID wellmanifest.ssot
 NAME "Wellmanifest SSOT decision DSL"
 VERSION 0.2.0-dev
-SCHEMA wellmanifest.project-ssot/v1
+SCHEMA wellmanifest.project-ssot/v2
 PURPOSE "Interview-driven classification of duplicated trees into propose-only SSOT decisions"
 
 PLACEMENT
@@ -106,6 +106,26 @@ RELATION docs.mirror
   SUBJECT docs/SSOT.md
   CANONICAL this-document
   RATIONALE "Docs and schemas listed here are generated mirrors or projections of the project SSOT, not a second description authority."
+
+CAPABILITY
+  VERB analyze
+  VERB validate
+  VERB generate
+  KEYWORD "ssot"
+  KEYWORD "interview"
+  KEYWORD "propose-only"
+  KEYWORD "duplication"
+  KEYWORD "placement"
+  STACK python
+  ENTRYPOINT module project_ssot "PYTHONPATH=src python3 -m project_ssot validate <document>"
+  INSTALL src-only
+  MATURITY experimental
+  SIBLING wellmanifest.dsl depends-on
+  SIBLING wellmanifest.new-project extends
+  USE_WHEN "you must decide which of several duplicated trees is canonical, and record why"
+  USE_WHEN "you need a typed project description an agent can consume instead of prose"
+  DO_NOT_USE_WHEN "you want the repository crawled or edited - this pack is propose-only and never writes"
+  DO_NOT_USE_WHEN "you only need git state or freshness across a fleet - reach for a repository auditor instead"
 
 PACKAGING none
 

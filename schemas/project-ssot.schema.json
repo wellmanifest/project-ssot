@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://wellmanifest.com/schemas/project-ssot/v1",
-  "title": "Wellmanifest project SSOT document v1",
-  "description": "Canonical project description assembled from typed evidence. Propose-only: the document never authorizes edits, crawls, or README rewrites. Generated prose is a projection of this AST.",
+  "$id": "https://wellmanifest.com/schemas/project-ssot/v2",
+  "title": "Wellmanifest project SSOT document v2",
+  "description": "Canonical project description assembled from typed evidence. Propose-only: the document never authorizes edits, crawls, or README rewrites. Generated prose is a projection of this AST. v2 adds the capability block, which is what lets a consumer decide whether to use this project for a given task, and opens placement.home from a closed enum to a registry-backed identifier.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,40 +20,85 @@
     "questions"
   ],
   "properties": {
-    "$schema": { "type": "string", "format": "uri" },
-    "schema": { "const": "wellmanifest.project-ssot/v1" },
-    "id": { "$ref": "#/$defs/identifier" },
-    "name": { "type": "string", "minLength": 1, "maxLength": 200 },
-    "version": { "$ref": "#/$defs/semver" },
-    "purpose": { "type": "string", "minLength": 1, "maxLength": 400 },
-    "placement": { "$ref": "#/$defs/placement" },
+    "$schema": {
+      "type": "string",
+      "format": "uri"
+    },
+    "schema": {
+      "enum": [
+        "wellmanifest.project-ssot/v2",
+        "wellmanifest.project-ssot/v1"
+      ]
+    },
+    "id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "placement": {
+      "$ref": "#/$defs/placement"
+    },
     "owners": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/$defs/owner" }
+      "items": {
+        "$ref": "#/$defs/owner"
+      }
     },
-    "policy": { "$ref": "#/$defs/projectPolicy" },
+    "policy": {
+      "$ref": "#/$defs/projectPolicy"
+    },
     "adopted": {
       "type": "array",
-      "items": { "$ref": "#/$defs/adopted" }
+      "items": {
+        "$ref": "#/$defs/adopted"
+      }
     },
     "evidence": {
       "type": "array",
-      "items": { "$ref": "#/$defs/evidence" }
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
     },
     "relations": {
       "type": "array",
-      "items": { "$ref": "#/$defs/relation" }
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
     },
-    "packaging": { "$ref": "#/$defs/packaging" },
-    "receipt": { "$ref": "#/$defs/receipt" },
+    "packaging": {
+      "$ref": "#/$defs/packaging"
+    },
+    "receipt": {
+      "$ref": "#/$defs/receipt"
+    },
     "conflicts": {
       "type": "array",
-      "items": { "$ref": "#/$defs/conflict" }
+      "items": {
+        "$ref": "#/$defs/conflict"
+      }
     },
     "questions": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1, "maxLength": 400 }
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 400
+      }
+    },
+    "capability": {
+      "$ref": "#/$defs/capability"
     }
   },
   "$defs": {
@@ -78,10 +123,18 @@
       "pattern": "^sha256:[a-f0-9]{64}$"
     },
     "home": {
-      "enum": ["wellmanifest", "subactor", "semcod"]
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+      "description": "Placement HOME organization id. Deliberately NOT a closed enum: a standard whose machine-checkable schema hardcodes its own adopters cannot be adopted by anyone else. Known homes are listed in registry/homes.json; an unknown home is a warning, not a rejection."
     },
     "shape": {
-      "enum": ["domain_pack", "runtime_service", "both"]
+      "enum": [
+        "domain_pack",
+        "runtime_service",
+        "both"
+      ]
     },
     "adoptId": {
       "type": "string",
@@ -90,7 +143,11 @@
       "pattern": "^wellmanifest/[a-z0-9][a-z0-9-]*$"
     },
     "ssotKind": {
-      "enum": ["generated_mirror", "facade", "allowed_divergence"]
+      "enum": [
+        "generated_mirror",
+        "facade",
+        "allowed_divergence"
+      ]
     },
     "sourceKind": {
       "enum": [
@@ -114,26 +171,51 @@
     "placement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["home", "shape"],
+      "required": [
+        "home",
+        "shape"
+      ],
       "description": "Same object as new-project intent.placement. ADOPT is not HOME. runtime_service must not HOME wellmanifest. runtimeOwner omitted inherits home.",
       "properties": {
-        "home": { "$ref": "#/$defs/home" },
-        "shape": { "$ref": "#/$defs/shape" },
-        "runtimeOwner": { "$ref": "#/$defs/home" },
+        "home": {
+          "$ref": "#/$defs/home"
+        },
+        "shape": {
+          "$ref": "#/$defs/shape"
+        },
+        "runtimeOwner": {
+          "$ref": "#/$defs/home"
+        },
         "adopt": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/adoptId" }
+          "items": {
+            "$ref": "#/$defs/adoptId"
+          }
         }
       }
     },
     "owner": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id"],
+      "required": [
+        "kind",
+        "id"
+      ],
       "properties": {
-        "kind": { "enum": ["repository", "organization", "team", "person"] },
-        "id": { "type": "string", "minLength": 1, "maxLength": 200 }
+        "kind": {
+          "enum": [
+            "repository",
+            "organization",
+            "team",
+            "person"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
       }
     },
     "forbidDo": {
@@ -173,27 +255,54 @@
         "forbid"
       ],
       "properties": {
-        "kind": { "const": "project_policy" },
-        "descriptionIsProjection": { "const": true },
-        "readmeAuthority": { "enum": ["generated_from_document", "none"] },
-        "unknownPolicy": { "const": "reject" },
-        "effectModel": { "const": "propose-only" },
-        "analyzerTreatAsDebtUntilInterview": { "type": "boolean" },
-        "adoptDoesNotImplyHome": { "const": true },
+        "kind": {
+          "const": "project_policy"
+        },
+        "descriptionIsProjection": {
+          "const": true
+        },
+        "readmeAuthority": {
+          "enum": [
+            "generated_from_document",
+            "none"
+          ]
+        },
+        "unknownPolicy": {
+          "const": "reject"
+        },
+        "effectModel": {
+          "const": "propose-only"
+        },
+        "analyzerTreatAsDebtUntilInterview": {
+          "type": "boolean"
+        },
+        "adoptDoesNotImplyHome": {
+          "const": true
+        },
         "forbid": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/forbidDo" }
+          "items": {
+            "$ref": "#/$defs/forbidDo"
+          }
         },
         "actions": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["do"],
+            "required": [
+              "do"
+            ],
             "properties": {
-              "do": { "$ref": "#/$defs/actionDo" },
-              "target": { "type": "string", "minLength": 1, "maxLength": 300 }
+              "do": {
+                "$ref": "#/$defs/actionDo"
+              },
+              "target": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
             }
           }
         }
@@ -202,47 +311,115 @@
     "adopted": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["standard", "relation"],
+      "required": [
+        "standard",
+        "relation"
+      ],
       "properties": {
-        "standard": { "type": "string", "minLength": 1, "maxLength": 160 },
-        "relation": {
-          "enum": ["extends", "implements", "maps-to", "compatible-with"]
+        "standard": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
         },
-        "uri": { "type": "string", "minLength": 1, "maxLength": 300 }
+        "relation": {
+          "enum": [
+            "extends",
+            "implements",
+            "maps-to",
+            "compatible-with"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
       }
     },
     "evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "path", "precedence", "role"],
+      "required": [
+        "id",
+        "kind",
+        "path",
+        "precedence",
+        "role"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/identifier" },
-        "kind": { "$ref": "#/$defs/sourceKind" },
-        "path": { "$ref": "#/$defs/relativePath" },
-        "precedence": { "type": "integer", "minimum": 0, "maximum": 100 },
-        "role": {
-          "enum": ["authority", "evidence", "projection_candidate", "packaging"]
+        "id": {
+          "$ref": "#/$defs/identifier"
         },
-        "digest": { "$ref": "#/$defs/digest" },
-        "ssotKind": { "$ref": "#/$defs/ssotKind" }
+        "kind": {
+          "$ref": "#/$defs/sourceKind"
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "precedence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "role": {
+          "enum": [
+            "authority",
+            "evidence",
+            "projection_candidate",
+            "packaging"
+          ]
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "ssotKind": {
+          "$ref": "#/$defs/ssotKind"
+        }
       }
     },
     "relation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "subject", "canonical"],
+      "required": [
+        "id",
+        "kind",
+        "subject",
+        "canonical"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/identifier" },
-        "kind": { "$ref": "#/$defs/ssotKind" },
-        "subject": { "type": "string", "minLength": 1, "maxLength": 300 },
-        "canonical": { "type": "string", "minLength": 1, "maxLength": 300 },
-        "rationale": { "type": "string", "minLength": 1, "maxLength": 800 },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "$ref": "#/$defs/ssotKind"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "canonical": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 800
+        },
         "knownDivergent": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["reason"],
+          "required": [
+            "reason"
+          ],
           "properties": {
-            "reason": { "type": "string", "minLength": 1, "maxLength": 400 }
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400
+            }
           }
         }
       }
@@ -250,26 +427,46 @@
     "packaging": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind"],
+      "required": [
+        "kind"
+      ],
       "properties": {
-        "kind": { "enum": ["none", "pip", "npm", "other"] },
-        "path": { "$ref": "#/$defs/relativePath" }
+        "kind": {
+          "enum": [
+            "none",
+            "pip",
+            "npm",
+            "other"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        }
       }
     },
     "receipt": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["sourceDigests"],
+      "required": [
+        "sourceDigests"
+      ],
       "properties": {
         "sourceDigests": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["path", "digest"],
+            "required": [
+              "path",
+              "digest"
+            ],
             "properties": {
-              "path": { "$ref": "#/$defs/relativePath" },
-              "digest": { "$ref": "#/$defs/digest" }
+              "path": {
+                "$ref": "#/$defs/relativePath"
+              },
+              "digest": {
+                "$ref": "#/$defs/digest"
+              }
             }
           }
         }
@@ -278,23 +475,355 @@
     "conflict": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["field", "values"],
+      "required": [
+        "field",
+        "values"
+      ],
       "properties": {
-        "field": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "field": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
         "values": {
           "type": "array",
           "minItems": 2,
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["source", "value"],
+            "required": [
+              "source",
+              "value"
+            ],
             "properties": {
-              "source": { "type": "string", "minLength": 1, "maxLength": 80 },
-              "value": { "type": "string", "minLength": 1, "maxLength": 400 }
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 400
+              }
             }
           }
         },
-        "resolvedBy": { "type": "string", "minLength": 1, "maxLength": 80 }
+        "resolvedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      }
+    },
+    "capabilityVerb": {
+      "enum": [
+        "analyze",
+        "audit",
+        "discover",
+        "index",
+        "query",
+        "generate",
+        "transform",
+        "convert",
+        "document",
+        "package",
+        "validate",
+        "test",
+        "lint",
+        "repair",
+        "refactor",
+        "plan",
+        "orchestrate",
+        "execute",
+        "schedule",
+        "deploy",
+        "serve",
+        "monitor",
+        "publish",
+        "sync"
+      ]
+    },
+    "capabilityIoKind": {
+      "enum": [
+        "directory",
+        "repository",
+        "file",
+        "json",
+        "yaml",
+        "markdown",
+        "sqlite",
+        "protobuf",
+        "http",
+        "stream",
+        "stdout",
+        "database",
+        "other"
+      ]
+    },
+    "capabilityIo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/capabilityIoKind"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "entrypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name",
+        "invoke"
+      ],
+      "description": "A way to actually run this project. MUST be provable: docval cross-reference verifies the command exists in source.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "cli",
+            "module",
+            "http",
+            "library",
+            "make",
+            "script"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "invoke": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "declaredIn": {
+          "$ref": "#/$defs/relativePath"
+        }
+      }
+    },
+    "installStatus": {
+      "enum": [
+        "pypi",
+        "npm",
+        "binary",
+        "src-only",
+        "container",
+        "none"
+      ]
+    },
+    "install": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "description": "How a consumer obtains a working invocation. src-only means the entrypoint needs PYTHONPATH or an equivalent, which changes how an agent must call it.",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/installStatus"
+        },
+        "package": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "verified": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "maturityLevel": {
+      "enum": [
+        "experimental",
+        "beta",
+        "stable",
+        "maintenance",
+        "deprecated"
+      ]
+    },
+    "maturity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "$ref": "#/$defs/maturityLevel"
+        },
+        "grade": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "siblingRelation": {
+      "enum": [
+        "invokes",
+        "extends",
+        "overlaps",
+        "superseded-by",
+        "supersedes",
+        "exports-to",
+        "facade-of",
+        "depends-on",
+        "alternative-to"
+      ]
+    },
+    "sibling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "relation"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "relation": {
+          "$ref": "#/$defs/siblingRelation"
+        },
+        "target": {
+          "$ref": "#/$defs/identifier"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verbs",
+        "useWhen",
+        "doNotUseWhen"
+      ],
+      "description": "What this project can do, stated so a consumer can decide whether to use it. verbs/useWhen/doNotUseWhen are human-resolved: no static analyzer can derive them, and getting them wrong is what makes a consumer pick the wrong project.",
+      "properties": {
+        "verbs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/capabilityVerb"
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 40
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capabilityIo"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capabilityIo"
+          }
+        },
+        "entrypoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entrypoint"
+          }
+        },
+        "install": {
+          "$ref": "#/$defs/install"
+        },
+        "maturity": {
+          "$ref": "#/$defs/maturity"
+        },
+        "siblings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sibling"
+          }
+        },
+        "useWhen": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 300
+          }
+        },
+        "doNotUseWhen": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "description": "The highest-value field in the document: it is what stops a consumer picking a project whose name misleads.",
+          "items": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 300
+          }
+        },
+        "stacks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          }
+        },
+        "workstreamHints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
       }
     }
   }

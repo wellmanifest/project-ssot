@@ -239,3 +239,107 @@ class DigestBindTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CapabilityV2Tests(unittest.TestCase):
+    """v2 capability block: composition, validation, and the v1 fallback."""
+
+    def _document(self, **capability):
+        base = {
+            "verbs": ["analyze"],
+            "useWhen": ["you need X"],
+            "doNotUseWhen": ["you need Y instead"],
+        }
+        base.update(capability)
+        return base
+
+    def test_capability_required_by_v2_optional_in_v1(self) -> None:
+        self.assertTrue(pack.capability_findings(None, pack.SCHEMA_DOCUMENT))
+        self.assertEqual(pack.capability_findings(None, pack.SCHEMA_DOCUMENT_V1), [])
+
+    def test_minimal_capability_is_accepted(self) -> None:
+        self.assertEqual(pack.capability_findings(self._document(), pack.SCHEMA_DOCUMENT), [])
+
+    def test_unknown_verb_is_rejected(self) -> None:
+        findings = pack.capability_findings(self._document(verbs=["frobnicate"]), pack.SCHEMA_DOCUMENT)
+        self.assertTrue(any(f.code == "PROJECT-CAPABILITY-001" for f in findings))
+
+    def test_do_not_use_when_is_mandatory(self) -> None:
+        value = self._document()
+        del value["doNotUseWhen"]
+        findings = pack.capability_findings(value, pack.SCHEMA_DOCUMENT)
+        self.assertTrue(any(f.code == "PROJECT-CAPABILITY-002" for f in findings))
+
+    def test_published_install_must_name_a_package(self) -> None:
+        findings = pack.capability_findings(
+            self._document(install={"status": "pypi"}), pack.SCHEMA_DOCUMENT
+        )
+        self.assertTrue(any("package" in f.message for f in findings))
+        self.assertEqual(
+            pack.capability_findings(
+                self._document(install={"status": "src-only"}), pack.SCHEMA_DOCUMENT
+            ),
+            [],
+        )
+
+    def test_superseded_by_must_name_the_replacement(self) -> None:
+        findings = pack.capability_findings(
+            self._document(siblings=[{"id": "semcod.prellm", "relation": "superseded-by"}]),
+            pack.SCHEMA_DOCUMENT,
+        )
+        self.assertTrue(any(f.code == "PROJECT-CAPABILITY-004" for f in findings))
+
+    def test_entrypoint_requires_an_invocation(self) -> None:
+        findings = pack.capability_findings(
+            self._document(entrypoints=[{"kind": "cli", "name": "x"}]), pack.SCHEMA_DOCUMENT
+        )
+        self.assertTrue(any(f.code == "PROJECT-CAPABILITY-003" for f in findings))
+
+    def test_unknown_capability_field_is_rejected(self) -> None:
+        findings = pack.capability_findings(self._document(nonsense=1), pack.SCHEMA_DOCUMENT)
+        self.assertTrue(any("unknown capability fields" in f.message for f in findings))
+
+    def test_classify_falls_back_to_v1_without_capability_answers(self) -> None:
+        answers = json.loads((EXAMPLES / "ssot-pack.interview.json").read_text())
+        for key in list(answers):
+            if key.startswith("capability_"):
+                del answers[key]
+        document = pack.classify(answers, json.loads((EXAMPLES / "ssot-pack.evidence.json").read_text()))
+        self.assertEqual(document["schema"], pack.SCHEMA_DOCUMENT_V1)
+        self.assertNotIn("capability", document)
+        self.assertTrue(any("map-ready" in q for q in document["questions"]))
+        self.assertEqual(pack.validate_decision(document), [])
+
+    def test_classify_emits_v2_with_capability_answers(self) -> None:
+        document = pack.classify(
+            json.loads((EXAMPLES / "ssot-pack.interview.json").read_text()),
+            json.loads((EXAMPLES / "ssot-pack.evidence.json").read_text()),
+        )
+        self.assertEqual(document["schema"], pack.SCHEMA_DOCUMENT)
+        self.assertEqual(document["capability"]["verbs"], ["analyze", "validate", "generate"])
+        self.assertEqual(pack.validate_decision(document), [])
+
+    def test_capability_survives_the_dsl_projection(self) -> None:
+        document = pack.classify(
+            json.loads((EXAMPLES / "ssot-pack.interview.json").read_text()),
+            json.loads((EXAMPLES / "ssot-pack.evidence.json").read_text()),
+        )
+        self.assertEqual(pack.parse_dsl(pack.render_dsl(document))["capability"], document["capability"])
+
+
+class OpenHomeTests(unittest.TestCase):
+    """HOME must not be a closed enum: a standard that hardcodes its adopters cannot be adopted."""
+
+    def test_registry_lists_autogrammar(self) -> None:
+        self.assertIn("autogrammar", pack.load_homes())
+
+    def test_well_formed_unknown_home_warns_but_is_not_a_hard_kind_error(self) -> None:
+        findings = pack.placement_findings({"home": "acme", "shape": "domain_pack"})
+        self.assertEqual([f.code for f in findings], ["PROJECT-HOME-002"])
+
+    def test_malformed_home_is_rejected(self) -> None:
+        findings = pack.placement_findings({"home": "Acme Corp", "shape": "domain_pack"})
+        self.assertTrue(any(f.code == "PROJECT-HOME-001" for f in findings))
+
+    def test_registry_fallback_when_missing(self) -> None:
+        self.assertEqual(pack.load_homes(Path("/nonexistent/homes.json")), set(pack.DEFAULT_HOMES))
