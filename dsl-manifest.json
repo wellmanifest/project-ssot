@@ -213,6 +213,7 @@
     "responseSchemas": [],
     "naturalLanguage": "typed-source-only",
     "sourceSchema": "wellmanifest.project-ssot/interview/v1",
+    "decisionProtocol": "none",
     "modelAuthority": "none",
     "strict": true
   },
@@ -291,7 +292,7 @@
     {
       "standard": "wellmanifest.ssot",
       "version": "0.2.0-dev",
-      "relation": "compatible-with",
+      "relation": "extends",
       "uri": "https://github.com/wellmanifest/ssot"
     },
     {
