@@ -154,7 +154,7 @@
     {
       "path": "registry/homes.json",
       "role": "normative-source",
-      "digest": "sha256:e495b3b4f801592e226cb20521fe2da5b10cd6fdccae436da28f72df2256c335"
+      "digest": "sha256:95e6cfb74586e07a3b115c44d7095fb10f63e1d9e98ec627d22e4070da7f8b8b"
     },
     {
       "path": "schemas/project-ssot-evidence-index.schema.json",
@@ -174,7 +174,7 @@
     {
       "path": "src/project_ssot.py",
       "role": "parser-contract",
-      "digest": "sha256:c8d3c0c9cf2fd72822a49f8551e4cae2f89919a24c0abb354ed6ffa8463ddf38"
+      "digest": "sha256:d7180faa0bf91f748aa7846c7568c3a455fdc25d3fd4152c025be5c42702b3bd"
     }
   ],
   "namespaces": [

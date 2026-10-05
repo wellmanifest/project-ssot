@@ -9,6 +9,8 @@
     { "id": "wellmanifest", "kind": "standards", "note": "Abstract, project-agnostic standards. MUST NOT home a runtime_service." },
     { "id": "subactor",     "kind": "product",   "note": "Product organization." },
     { "id": "semcod",       "kind": "tooling",   "note": "Developer tooling organization." },
-    { "id": "autogrammar",  "kind": "tooling",   "note": "Grammar/DSL tooling organization." }
+    { "id": "autogrammar",  "kind": "tooling",   "note": "Grammar/DSL tooling organization." },
+    { "id": "paxlet-com",   "kind": "product",   "note": "Paxlet ecosystem product and runtime organization." },
+    { "id": "clonerd-com",  "kind": "product",   "note": "Clonerd organization." }
   ]
 }

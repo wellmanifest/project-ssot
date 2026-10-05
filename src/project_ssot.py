@@ -39,25 +39,25 @@ HOME_ID = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
 #: Fallback used only when registry/homes.json is unreadable. HOME is deliberately
 #: NOT a closed enum: a standard whose schema hardcodes its own adopters cannot be
 #: adopted by a fourth party. An unknown-but-well-formed home is a warning.
-DEFAULT_HOMES = ("wellmanifest", "subactor", "semcod", "autogrammar")
+DEFAULT_HOMES = ("wellmanifest", "subactor", "semcod", "autogrammar", "paxlet-com", "clonerd-com")
 
 
 def load_homes(path: Path | None = None) -> set[str]:
     """Known placement HOMEs, from registry/homes.json."""
-    target = path or (repo_root() / "registry" / "homes.json")
+    target = path or (Path(__file__).resolve().parent.parent / "registry" / "homes.json")
     try:
-        document = load_json(target)
+        document = json.loads(target.read_text(encoding="utf-8"))
         homes = {
             str(entry["id"])
             for entry in document.get("homes", [])
             if isinstance(entry, Mapping) and entry.get("id")
         }
         return homes or set(DEFAULT_HOMES)
-    except (OSError, ValueError, KeyError, TypeError):
+    except Exception:
         return set(DEFAULT_HOMES)
 
 
-HOMES = set(DEFAULT_HOMES)
+HOMES = load_homes()
 SHAPES = {"domain_pack", "runtime_service", "both"}
 CAPABILITY_VERBS = {
     "analyze", "audit", "discover", "index", "query",
